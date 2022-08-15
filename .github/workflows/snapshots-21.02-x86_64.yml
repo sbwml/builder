@@ -1,0 +1,109 @@
+name: 21.02-SNAPSHOT_x86_64
+
+on:
+  schedule:
+    - cron: 0 19 * * *
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@main
+
+    - name: Set time zone
+      run: sudo timedatectl set-timezone 'Asia/Shanghai'
+
+    - name: Show system
+      run: |
+        echo -e "Total CPU cores\t: $(nproc)"
+        cat /proc/cpuinfo | grep 'model name'
+        free -h
+        uname -a
+        [ -f /proc/version ] && cat /proc/version
+        [ -f /etc/issue.net ] && cat /etc/issue.net
+        [ -f /etc/issue ] && cat /etc/issue
+        ulimit -a
+
+    - name: Free disk space
+      run: |
+        sudo -E swapoff -a
+        sudo -E rm -f /swapfile
+        sudo -E docker image prune -a -f
+        sudo -E snap set system refresh.retain=2
+        sudo -E apt-get -y purge dotnet* firefox ghc* google* hhvm llvm* mono* mysql* openjdk* php* zulu*
+        sudo -E apt-get -y autoremove --purge
+        sudo -E apt-get clean
+        sudo -E rm -rf /usr/share/dotnet /usr/local/lib/android/sdk /etc/mysql /etc/php /usr/local/share/boost
+        [ -n "$AGENT_TOOLSDIRECTORY" ] && sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+        df -h
+
+    - name: Init build dependencies
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo -E rm -rf /etc/apt/sources.list.d
+        sudo -E apt-get update -y
+        sudo -E apt-get install -y build-essential rsync asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core p7zip p7zip-full msmtp libssl-dev texinfo libreadline-dev libglib2.0-dev xmlto qemu-utils upx-ucl libelf-dev autoconf automake libtool autopoint ccache curl wget vim nano python3 python3-pip python3-ply haveged lrzsz device-tree-compiler scons
+        sudo -E apt-get clean -y
+        git config --global user.name 'GitHub Actions' && git config --global user.email 'noreply@github.com'
+        df -h
+
+    - name: Compile Openwrt
+      id: compileopenwrt
+      run: |
+        bash <(curl -sS ${{ secrets.script_url_general }}) dev x86
+        build_date=$(date "+%Y-%m-%d")
+        echo "build_date=$build_date" >>$GITHUB_ENV
+
+    - name: Assemble Artifact
+      id: assemble_artifact
+      run: |
+        mkdir -p rom info
+        cp -a openwrt/bin/targets/x86/64/*-ext4-combined-efi.img.gz rom/
+        cp -a openwrt/bin/targets/x86/64/*-squashfs-combined-efi.img.gz rom/
+        cp -a openwrt/bin/targets/x86/64/*-generic-rootfs.tar.gz rom/
+        cp -a openwrt/bin/targets/x86/64/*-x86-64-generic.manifest info/manifest.txt
+        cp -a openwrt/bin/targets/x86/64/config.buildinfo info/config.buildinfo
+        cd rom && sha256sum *gz > ../info/sha256sums.txt
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ env.build_date }}
+        path: rom/*.gz
+
+    - name: Install AliyunDrive CLI
+      id: aliyundrive
+      continue-on-error: true
+      run: |
+        sudo curl -L ${{ secrets.aliyundrive }} -o /bin/aliyundrive --progress-bar
+        sudo chmod 0755 /bin/aliyundrive
+        aliyun_token=`curl -s ${{ secrets.aliyun_token }}`
+        echo "refresh_token: '$aliyun_token'" > ~/.config/aliyunpan.yaml
+
+    - name: Upload Firmware - hash
+      id: upload-hash
+      continue-on-error: true
+      run: |
+        timeout 5m aliyundrive upload --retry 10 -f info/manifest.txt openwrt-x86/hash/ || true
+        timeout 5m aliyundrive upload --retry 10 -f info/config.buildinfo openwrt-x86/hash/ || true
+        timeout 5m aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt-x86/hash/ || true
+        timeout 5m aliyundrive upload --retry 10 -f rom/*-generic-rootfs.tar.gz openwrt-x86/hash/ || true
+        timeout 5m aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt-x86/hash/ || true
+        timeout 5m aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt-x86/hash/ || true
+
+    - name: Upload Firmware - 21.02-SNAPSHOT
+      id: upload-firmware
+      continue-on-error: true
+      run: |
+        DATE=$(date "+%Y-%m-%d")
+        aliyundrive mkdir openwrt-x86/snapshots/21.02-SNAPSHOT/$DATE
+        timeout 5m aliyundrive upload --retry 10 -f info/manifest.txt openwrt-x86/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 5m aliyundrive upload --retry 10 -f info/config.buildinfo openwrt-x86/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 5m aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt-x86/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 5m aliyundrive upload --retry 10 -f rom/*-generic-rootfs.tar.gz openwrt-x86/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 5m aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt-x86/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 5m aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt-x86/snapshots/21.02-SNAPSHOT/$DATE/ || true
