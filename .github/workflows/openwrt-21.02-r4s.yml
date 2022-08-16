@@ -79,34 +79,3 @@ jobs:
         replacesArtifacts: true
         token: ${{ secrets.workflow_token }}
         artifacts: rom/*
-
-    - name: Install AliyunDrive CLI
-      id: aliyundrive
-      continue-on-error: true
-      run: |
-        sudo curl -L ${{ secrets.aliyundrive }} -o /bin/aliyundrive --progress-bar
-        sudo chmod 0755 /bin/aliyundrive
-        aliyun_token=`curl -s ${{ secrets.aliyun_token }}`
-        echo "refresh_token: '$aliyun_token'" > ~/.config/aliyunpan.yaml
-
-    - name: Upload Firmware - hash
-      id: upload-hash
-      continue-on-error: true
-      run: |
-        timeout 5m aliyundrive upload --retry 10 -f info/manifest.txt openwrt/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-r4s-ext4-sysupgrade.img.gz openwrt/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/hash/ || true
-
-    - name: Upload Firmware - releases
-      id: upload-firmware
-      continue-on-error: true
-      run: |
-        version=$(cat openwrt/version.txt)
-        aliyundrive mkdir openwrt/releases/$version
-        timeout 5m aliyundrive upload --retry 10 -f info/manifest.txt openwrt/releases/$version/ || true
-        timeout 5m aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/releases/$version/ || true
-        timeout 5m aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/releases/$version/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-r4s-ext4-sysupgrade.img.gz openwrt/releases/$version/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/releases/$version/ || true
