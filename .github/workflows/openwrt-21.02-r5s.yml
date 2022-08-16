@@ -90,7 +90,6 @@ jobs:
       run: |
         sudo curl -L ${{ secrets.aliyundrive }} -o /bin/aliyundrive --progress-bar
         sudo chmod 0755 /bin/aliyundrive
-        # Get RefreshToken
         aliyun_token=`curl -s ${{ secrets.aliyun_token }}`
         echo "refresh_token: '$aliyun_token'" > ~/.config/aliyunpan.yaml
 

@@ -2,7 +2,7 @@ name: 21.02-SNAPSHOT_x86_64
 
 on:
   schedule:
-    - cron: 0 19 * * *
+    - cron: 0 16 * * *
 
 jobs:
   build:
@@ -95,7 +95,7 @@ jobs:
         timeout 5m aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt-x86/hash/ || true
         timeout 5m aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt-x86/hash/ || true
 
-    - name: Upload Firmware - 21.02-SNAPSHOT
+    - name: Upload Firmware - snapshots
       id: upload-firmware
       continue-on-error: true
       run: |

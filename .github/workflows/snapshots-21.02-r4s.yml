@@ -1,4 +1,4 @@
-name: 22.03-SNAPSHOT_x86_64
+name: 21.02-SNAPSHOT_nanopi-r4s
 
 on:
   schedule:
@@ -54,7 +54,7 @@ jobs:
     - name: Compile Openwrt
       id: compileopenwrt
       run: |
-        bash <(curl -sS ${{ secrets.script_url_general }}) dev2 x86
+        bash <(curl -sS ${{ secrets.script_url_general }}) dev
         build_date=$(date "+%Y-%m-%d")
         echo "build_date=$build_date" >>$GITHUB_ENV
 
@@ -62,11 +62,9 @@ jobs:
       id: assemble_artifact
       run: |
         mkdir -p rom info
-        cp -a openwrt/bin/targets/x86/64/*-ext4-combined-efi.img.gz rom/
-        cp -a openwrt/bin/targets/x86/64/*-squashfs-combined-efi.img.gz rom/
-        cp -a openwrt/bin/targets/x86/64/*-generic-rootfs.tar.gz rom/
-        cp -a openwrt/bin/targets/x86/64/*-x86-64-generic.manifest info/manifest.txt
-        cp -a openwrt/bin/targets/x86/64/config.buildinfo info/config.buildinfo
+        cp -a openwrt/bin/targets/rockchip/armv8/*.img.gz rom/
+        cp -a openwrt/bin/targets/rockchip/armv8/*-r4s.manifest info/manifest.txt
+        cp -a openwrt/bin/targets/rockchip/armv8/config.buildinfo info/config.buildinfo
         cd rom && sha256sum *gz > ../info/sha256sums.txt
 
     - name: Upload artifacts
@@ -88,22 +86,20 @@ jobs:
       id: upload-hash
       continue-on-error: true
       run: |
-        timeout 5m aliyundrive upload --retry 10 -f info/manifest.txt openwrt-x86/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f info/config.buildinfo openwrt-x86/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt-x86/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-generic-rootfs.tar.gz openwrt-x86/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt-x86/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt-x86/hash/ || true
+        timeout 5m aliyundrive upload --retry 10 -f info/manifest.txt openwrt/hash/ || true
+        timeout 5m aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/hash/ || true
+        timeout 5m aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/hash/ || true
+        timeout 5m aliyundrive upload --retry 10 -f rom/*-r4s-ext4-sysupgrade.img.gz openwrt/hash/ || true
+        timeout 5m aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/hash/ || true
 
     - name: Upload Firmware - snapshots
       id: upload-firmware
       continue-on-error: true
       run: |
         DATE=$(date "+%Y-%m-%d")
-        aliyundrive mkdir openwrt-x86/snapshots/22.03-SNAPSHOT/$DATE
-        timeout 5m aliyundrive upload --retry 10 -f info/manifest.txt openwrt-x86/snapshots/22.03-SNAPSHOT/$DATE/ || true
-        timeout 5m aliyundrive upload --retry 10 -f info/config.buildinfo openwrt-x86/snapshots/22.03-SNAPSHOT/$DATE/ || true
-        timeout 5m aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt-x86/snapshots/22.03-SNAPSHOT/$DATE/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-generic-rootfs.tar.gz openwrt-x86/snapshots/22.03-SNAPSHOT/$DATE/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt-x86/snapshots/22.03-SNAPSHOT/$DATE/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt-x86/snapshots/22.03-SNAPSHOT/$DATE/ || true
+        aliyundrive mkdir openwrt/snapshots/21.02-SNAPSHOT/$DATE
+        timeout 5m aliyundrive upload --retry 10 -f info/manifest.txt openwrt/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 5m aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 5m aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 5m aliyundrive upload --retry 10 -f rom/*-r4s-ext4-sysupgrade.img.gz openwrt/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 5m aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/snapshots/21.02-SNAPSHOT/$DATE/ || true

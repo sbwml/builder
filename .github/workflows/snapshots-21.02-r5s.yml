@@ -1,4 +1,4 @@
-name: 22.03-SNAPSHOT_x86_64
+name: 21.02-SNAPSHOT_nanopi-r5s
 
 on:
   schedule:
@@ -46,7 +46,11 @@ jobs:
       run: |
         sudo -E rm -rf /etc/apt/sources.list.d
         sudo -E apt-get update -y
-        sudo -E apt-get install -y build-essential rsync asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core p7zip p7zip-full msmtp libssl-dev texinfo libreadline-dev libglib2.0-dev xmlto qemu-utils upx-ucl libelf-dev autoconf automake libtool autopoint ccache curl wget vim nano python3 python3-pip python3-ply haveged lrzsz device-tree-compiler scons
+        sudo -E apt-get install -y build-essential rsync asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core p7zip p7zip-full msmtp texinfo libreadline-dev libglib2.0-dev xmlto qemu-utils upx-ucl libelf-dev autoconf automake libtool autopoint ccache curl wget vim nano python3 python3-pip python3-ply haveged lrzsz device-tree-compiler scons android-sdk-libsparse-utils android-sdk-ext4-utils
+        echo "deb http://archive.ubuntu.com/ubuntu/ bionic-security main" | sudo tee -a /etc/apt/sources.list
+        sudo -E apt-get update
+        sudo -E apt-cache policy libssl1.0-dev
+        sudo -E apt-get install -y libssl1.0-dev kmod
         sudo -E apt-get clean -y
         git config --global user.name 'GitHub Actions' && git config --global user.email 'noreply@github.com'
         df -h
@@ -54,7 +58,7 @@ jobs:
     - name: Compile Openwrt
       id: compileopenwrt
       run: |
-        bash <(curl -sS ${{ secrets.script_url_general }}) dev2 x86
+        bash <(curl -sS ${{ secrets.script_url_nanopi_r5s }}) dev
         build_date=$(date "+%Y-%m-%d")
         echo "build_date=$build_date" >>$GITHUB_ENV
 
@@ -62,12 +66,10 @@ jobs:
       id: assemble_artifact
       run: |
         mkdir -p rom info
-        cp -a openwrt/bin/targets/x86/64/*-ext4-combined-efi.img.gz rom/
-        cp -a openwrt/bin/targets/x86/64/*-squashfs-combined-efi.img.gz rom/
-        cp -a openwrt/bin/targets/x86/64/*-generic-rootfs.tar.gz rom/
-        cp -a openwrt/bin/targets/x86/64/*-x86-64-generic.manifest info/manifest.txt
-        cp -a openwrt/bin/targets/x86/64/config.buildinfo info/config.buildinfo
-        cd rom && sha256sum *gz > ../info/sha256sums.txt
+        cp -a rk356x_tools/out/*.gz rom/
+        cp -a rk356x_tools/out/*.zip rom/
+        cp -a rk356x_tools/out/*.txt info/
+        cp -a rk356x_tools/out/*.buildinfo info/
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
@@ -88,22 +90,22 @@ jobs:
       id: upload-hash
       continue-on-error: true
       run: |
-        timeout 5m aliyundrive upload --retry 10 -f info/manifest.txt openwrt-x86/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f info/config.buildinfo openwrt-x86/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt-x86/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-generic-rootfs.tar.gz openwrt-x86/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt-x86/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt-x86/hash/ || true
+        timeout 5m aliyundrive upload --retry 10 -f info/manifest.txt nanopi-r5s/hash/ || true
+        timeout 5m aliyundrive upload --retry 10 -f info/config.buildinfo nanopi-r5s/hash/ || true
+        timeout 5m aliyundrive upload --retry 10 -f info/sha256sums.txt nanopi-r5s/hash/ || true
+        timeout 5m aliyundrive upload --retry 10 -f rom/*-r5s-emmc.img.zip nanopi-r5s/hash/ || true
+        timeout 5m aliyundrive upload --retry 10 -f rom/*-r5s-squashfs-sysupgrade.img.gz nanopi-r5s/hash/ || true
+        timeout 5m aliyundrive upload --retry 10 -f rom/*-r5s-ext4-sysupgrade.img.gz nanopi-r5s/hash/ || true
 
     - name: Upload Firmware - snapshots
       id: upload-firmware
       continue-on-error: true
       run: |
         DATE=$(date "+%Y-%m-%d")
-        aliyundrive mkdir openwrt-x86/snapshots/22.03-SNAPSHOT/$DATE
-        timeout 5m aliyundrive upload --retry 10 -f info/manifest.txt openwrt-x86/snapshots/22.03-SNAPSHOT/$DATE/ || true
-        timeout 5m aliyundrive upload --retry 10 -f info/config.buildinfo openwrt-x86/snapshots/22.03-SNAPSHOT/$DATE/ || true
-        timeout 5m aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt-x86/snapshots/22.03-SNAPSHOT/$DATE/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-generic-rootfs.tar.gz openwrt-x86/snapshots/22.03-SNAPSHOT/$DATE/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt-x86/snapshots/22.03-SNAPSHOT/$DATE/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt-x86/snapshots/22.03-SNAPSHOT/$DATE/ || true
+        aliyundrive mkdir nanopi-r5s/snapshots/21.02-SNAPSHOT/$DATE
+        timeout 5m aliyundrive upload -f info/manifest.txt nanopi-r5s/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 5m aliyundrive upload -f info/config.buildinfo nanopi-r5s/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 5m aliyundrive upload -f info/sha256sums.txt nanopi-r5s/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 5m aliyundrive upload -f rom/*-r5s-emmc.img.zip nanopi-r5s/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 5m aliyundrive upload -f rom/*-r5s-squashfs-sysupgrade.img.gz nanopi-r5s/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 5m aliyundrive upload -f rom/*-r5s-ext4-sysupgrade.img.gz nanopi-r5s/snapshots/21.02-SNAPSHOT/$DATE/ || true
