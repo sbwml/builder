@@ -95,11 +95,11 @@ jobs:
       id: upload-hash
       continue-on-error: true
       run: |
-        timeout 5m aliyundrive upload --retry 10 -f info/manifest.txt openwrt/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-r4s-ext4-sysupgrade.img.gz openwrt/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/hash/ || true
+        timeout 15m aliyundrive upload --retry 10 -f info/manifest.txt openwrt/hash/ || true
+        timeout 15m aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/hash/ || true
+        timeout 15m aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/hash/ || true
+        timeout 15m aliyundrive upload --retry 10 -f rom/*-r4s-ext4-sysupgrade.img.gz openwrt/hash/ || true
+        timeout 15m aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/hash/ || true
 
     - name: Upload Firmware - candidate
       id: upload-firmware
@@ -107,8 +107,8 @@ jobs:
       run: |
         version=$(cat openwrt/version.txt)
         aliyundrive mkdir openwrt/candidate/$version
-        timeout 5m aliyundrive upload --retry 10 -f info/manifest.txt openwrt/candidate/$version/ || true
-        timeout 5m aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/candidate/$version/ || true
-        timeout 5m aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/candidate/$version/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-r4s-ext4-sysupgrade.img.gz openwrt/candidate/$version/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/candidate/$version/ || true
+        timeout 15m aliyundrive upload --retry 10 -f info/manifest.txt openwrt/candidate/$version/ || true
+        timeout 15m aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/candidate/$version/ || true
+        timeout 15m aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/candidate/$version/ || true
+        timeout 15m aliyundrive upload --retry 10 -f rom/*-r4s-ext4-sysupgrade.img.gz openwrt/candidate/$version/ || true
+        timeout 15m aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/candidate/$version/ || true

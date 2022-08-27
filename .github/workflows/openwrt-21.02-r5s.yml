@@ -98,12 +98,12 @@ jobs:
       id: upload-hash
       continue-on-error: true
       run: |
-        timeout 5m aliyundrive upload --retry 10 -f info/manifest.txt nanopi-r5s/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f info/config.buildinfo nanopi-r5s/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f info/sha256sums.txt nanopi-r5s/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-r5s-emmc.img.zip nanopi-r5s/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-r5s-squashfs-sysupgrade.img.gz nanopi-r5s/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-r5s-ext4-sysupgrade.img.gz nanopi-r5s/hash/ || true
+        timeout 15m aliyundrive upload --retry 10 -f info/manifest.txt nanopi-r5s/hash/ || true
+        timeout 15m aliyundrive upload --retry 10 -f info/config.buildinfo nanopi-r5s/hash/ || true
+        timeout 15m aliyundrive upload --retry 10 -f info/sha256sums.txt nanopi-r5s/hash/ || true
+        timeout 15m aliyundrive upload --retry 10 -f rom/*-r5s-emmc.img.zip nanopi-r5s/hash/ || true
+        timeout 15m aliyundrive upload --retry 10 -f rom/*-r5s-squashfs-sysupgrade.img.gz nanopi-r5s/hash/ || true
+        timeout 15m aliyundrive upload --retry 10 -f rom/*-r5s-ext4-sysupgrade.img.gz nanopi-r5s/hash/ || true
 
     - name: Upload Firmware - releases
       id: upload-firmware
@@ -111,9 +111,9 @@ jobs:
       run: |
         version=$(cat openwrt/version.txt)
         aliyundrive mkdir nanopi-r5s/releases/$version
-        timeout 5m aliyundrive upload -f info/manifest.txt nanopi-r5s/releases/$version/ || true
-        timeout 5m aliyundrive upload -f info/config.buildinfo nanopi-r5s/releases/$version/ || true
-        timeout 5m aliyundrive upload -f info/sha256sums.txt nanopi-r5s/releases/$version/ || true
-        timeout 5m aliyundrive upload -f rom/*-r5s-emmc.img.zip nanopi-r5s/releases/$version/ || true
-        timeout 5m aliyundrive upload -f rom/*-r5s-squashfs-sysupgrade.img.gz nanopi-r5s/releases/$version/ || true
-        timeout 5m aliyundrive upload -f rom/*-r5s-ext4-sysupgrade.img.gz nanopi-r5s/releases/$version/ || true
+        timeout 15m aliyundrive upload -f info/manifest.txt nanopi-r5s/releases/$version/ || true
+        timeout 15m aliyundrive upload -f info/config.buildinfo nanopi-r5s/releases/$version/ || true
+        timeout 15m aliyundrive upload -f info/sha256sums.txt nanopi-r5s/releases/$version/ || true
+        timeout 15m aliyundrive upload -f rom/*-r5s-emmc.img.zip nanopi-r5s/releases/$version/ || true
+        timeout 15m aliyundrive upload -f rom/*-r5s-squashfs-sysupgrade.img.gz nanopi-r5s/releases/$version/ || true
+        timeout 15m aliyundrive upload -f rom/*-r5s-ext4-sysupgrade.img.gz nanopi-r5s/releases/$version/ || true

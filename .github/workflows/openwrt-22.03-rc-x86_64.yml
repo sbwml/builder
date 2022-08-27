@@ -97,12 +97,12 @@ jobs:
       id: upload-hash
       continue-on-error: true
       run: |
-        timeout 5m aliyundrive upload --retry 10 -f info/manifest.txt openwrt-x86/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f info/config.buildinfo openwrt-x86/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt-x86/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-generic-rootfs.tar.gz openwrt-x86/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt-x86/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt-x86/hash/ || true
+        timeout 15m aliyundrive upload --retry 10 -f info/manifest.txt openwrt-x86/hash/ || true
+        timeout 15m aliyundrive upload --retry 10 -f info/config.buildinfo openwrt-x86/hash/ || true
+        timeout 15m aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt-x86/hash/ || true
+        timeout 15m aliyundrive upload --retry 10 -f rom/*-generic-rootfs.tar.gz openwrt-x86/hash/ || true
+        timeout 15m aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt-x86/hash/ || true
+        timeout 15m aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt-x86/hash/ || true
 
     - name: Upload Firmware - candidate
       id: upload-firmware
@@ -110,9 +110,9 @@ jobs:
       run: |
         version=$(cat openwrt/version.txt)
         aliyundrive mkdir openwrt-x86/candidate/$version
-        timeout 5m aliyundrive upload --retry 10 -f info/manifest.txt openwrt-x86/candidate/$version/ || true
-        timeout 5m aliyundrive upload --retry 10 -f info/config.buildinfo openwrt-x86/candidate/$version/ || true
-        timeout 5m aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt-x86/candidate/$version/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-generic-rootfs.tar.gz openwrt-x86/candidate/$version/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt-x86/candidate/$version/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt-x86/candidate/$version/ || true
+        timeout 15m aliyundrive upload --retry 10 -f info/manifest.txt openwrt-x86/candidate/$version/ || true
+        timeout 15m aliyundrive upload --retry 10 -f info/config.buildinfo openwrt-x86/candidate/$version/ || true
+        timeout 15m aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt-x86/candidate/$version/ || true
+        timeout 15m aliyundrive upload --retry 10 -f rom/*-generic-rootfs.tar.gz openwrt-x86/candidate/$version/ || true
+        timeout 15m aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt-x86/candidate/$version/ || true
+        timeout 15m aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt-x86/candidate/$version/ || true

@@ -87,11 +87,11 @@ jobs:
       id: upload-hash
       continue-on-error: true
       run: |
-        timeout 5m aliyundrive upload --retry 10 -f info/manifest.txt openwrt/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-r4s-ext4-sysupgrade.img.gz openwrt/hash/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/hash/ || true
+        timeout 15m aliyundrive upload --retry 10 -f info/manifest.txt openwrt/hash/ || true
+        timeout 15m aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/hash/ || true
+        timeout 15m aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/hash/ || true
+        timeout 15m aliyundrive upload --retry 10 -f rom/*-r4s-ext4-sysupgrade.img.gz openwrt/hash/ || true
+        timeout 15m aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/hash/ || true
 
     - name: Upload Firmware - snapshots
       id: upload-firmware
@@ -99,8 +99,8 @@ jobs:
       run: |
         DATE=$(date "+%Y-%m-%d")
         aliyundrive mkdir openwrt/snapshots/21.02-SNAPSHOT/$DATE
-        timeout 5m aliyundrive upload --retry 10 -f info/manifest.txt openwrt/snapshots/21.02-SNAPSHOT/$DATE/ || true
-        timeout 5m aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/snapshots/21.02-SNAPSHOT/$DATE/ || true
-        timeout 5m aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/snapshots/21.02-SNAPSHOT/$DATE/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-r4s-ext4-sysupgrade.img.gz openwrt/snapshots/21.02-SNAPSHOT/$DATE/ || true
-        timeout 5m aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 15m aliyundrive upload --retry 10 -f info/manifest.txt openwrt/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 15m aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 15m aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 15m aliyundrive upload --retry 10 -f rom/*-r4s-ext4-sysupgrade.img.gz openwrt/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 15m aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/snapshots/21.02-SNAPSHOT/$DATE/ || true
