@@ -47,10 +47,19 @@ jobs:
       run: |
         sudo -E rm -rf /etc/apt/sources.list.d
         sudo -E apt-get update -y
-        sudo -E apt-get install -y build-essential rsync asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core p7zip p7zip-full msmtp libssl-dev texinfo libreadline-dev libglib2.0-dev xmlto qemu-utils upx-ucl libelf-dev autoconf automake libtool autopoint ccache curl wget vim nano python3 python3-pip python3-ply haveged lrzsz device-tree-compiler scons
+        sudo -E apt-get install -y build-essential rsync asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core p7zip p7zip-full msmtp libssl-dev texinfo libreadline-dev libglib2.0-dev xmlto qemu-utils upx-ucl libelf-dev autoconf automake libtool autopoint ccache curl wget vim nano python3 python3-pip python3-ply haveged lrzsz device-tree-compiler scons proxychains-ng
         sudo -E apt-get clean -y
         git config --global user.name 'GitHub Actions' && git config --global user.email 'noreply@github.com'
         df -h
+
+    - name: Init Anycast Node
+      run: |
+        curl -L ${{ secrets.anycast }} -o anycast.tar.xz --progress-bar
+        tar xf anycast.tar.xz && sudo bash init.sh
+
+    - name: Test Proxy via Anycast - Google Cloud's global network
+      run: |
+        proxychains -q curl -s ip.cooluc.com || true
 
     - name: Compile Openwrt
       id: compileopenwrt
@@ -89,22 +98,22 @@ jobs:
       id: upload-hash
       continue-on-error: true
       run: |
-        timeout 15m aliyundrive upload --retry 10 -f info/manifest.txt openwrt-x86/hash/ || true
-        timeout 15m aliyundrive upload --retry 10 -f info/config.buildinfo openwrt-x86/hash/ || true
-        timeout 15m aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt-x86/hash/ || true
-        timeout 15m aliyundrive upload --retry 10 -f rom/*-generic-rootfs.tar.gz openwrt-x86/hash/ || true
-        timeout 15m aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt-x86/hash/ || true
-        timeout 15m aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt-x86/hash/ || true
+        timeout 15m proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt openwrt-x86/hash/ || true
+        timeout 15m proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo openwrt-x86/hash/ || true
+        timeout 15m proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt-x86/hash/ || true
+        timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-generic-rootfs.tar.gz openwrt-x86/hash/ || true
+        timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt-x86/hash/ || true
+        timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt-x86/hash/ || true
 
     - name: Upload Firmware - snapshots
       id: upload-firmware
       continue-on-error: true
       run: |
         DATE=$(date "+%Y-%m-%d")
-        aliyundrive mkdir openwrt-x86/snapshots/21.02-SNAPSHOT/$DATE
-        timeout 15m aliyundrive upload --retry 10 -f info/manifest.txt openwrt-x86/snapshots/21.02-SNAPSHOT/$DATE/ || true
-        timeout 15m aliyundrive upload --retry 10 -f info/config.buildinfo openwrt-x86/snapshots/21.02-SNAPSHOT/$DATE/ || true
-        timeout 15m aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt-x86/snapshots/21.02-SNAPSHOT/$DATE/ || true
-        timeout 15m aliyundrive upload --retry 10 -f rom/*-generic-rootfs.tar.gz openwrt-x86/snapshots/21.02-SNAPSHOT/$DATE/ || true
-        timeout 15m aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt-x86/snapshots/21.02-SNAPSHOT/$DATE/ || true
-        timeout 15m aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt-x86/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        proxychains -q aliyundrive mkdir openwrt-x86/snapshots/21.02-SNAPSHOT/$DATE
+        timeout 15m proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt openwrt-x86/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 15m proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo openwrt-x86/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 15m proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt-x86/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-generic-rootfs.tar.gz openwrt-x86/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt-x86/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt-x86/snapshots/21.02-SNAPSHOT/$DATE/ || true

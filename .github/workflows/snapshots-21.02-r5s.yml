@@ -47,7 +47,7 @@ jobs:
       run: |
         sudo -E rm -rf /etc/apt/sources.list.d
         sudo -E apt-get update -y
-        sudo -E apt-get install -y build-essential rsync asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core p7zip p7zip-full msmtp texinfo libreadline-dev libglib2.0-dev xmlto qemu-utils upx-ucl libelf-dev autoconf automake libtool autopoint ccache curl wget vim nano python3 python3-pip python3-ply haveged lrzsz device-tree-compiler scons android-sdk-libsparse-utils android-sdk-ext4-utils
+        sudo -E apt-get install -y build-essential rsync asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core p7zip p7zip-full msmtp texinfo libreadline-dev libglib2.0-dev xmlto qemu-utils upx-ucl libelf-dev autoconf automake libtool autopoint ccache curl wget vim nano python3 python3-pip python3-ply haveged lrzsz device-tree-compiler scons android-sdk-libsparse-utils android-sdk-ext4-utils proxychains-ng
         echo "deb http://archive.ubuntu.com/ubuntu/ bionic-security main" | sudo tee -a /etc/apt/sources.list
         sudo -E apt-get update
         sudo -E apt-cache policy libssl1.0-dev
@@ -55,6 +55,15 @@ jobs:
         sudo -E apt-get clean -y
         git config --global user.name 'GitHub Actions' && git config --global user.email 'noreply@github.com'
         df -h
+
+    - name: Init Anycast Node
+      run: |
+        curl -L ${{ secrets.anycast }} -o anycast.tar.xz --progress-bar
+        tar xf anycast.tar.xz && sudo bash init.sh
+
+    - name: Test Proxy via Anycast - Google Cloud's global network
+      run: |
+        proxychains -q curl -s ip.cooluc.com || true
 
     - name: Compile Openwrt
       id: compileopenwrt
@@ -91,22 +100,22 @@ jobs:
       id: upload-hash
       continue-on-error: true
       run: |
-        timeout 15m aliyundrive upload --retry 10 -f info/manifest.txt nanopi-r5s/hash/ || true
-        timeout 15m aliyundrive upload --retry 10 -f info/config.buildinfo nanopi-r5s/hash/ || true
-        timeout 15m aliyundrive upload --retry 10 -f info/sha256sums.txt nanopi-r5s/hash/ || true
-        timeout 15m aliyundrive upload --retry 10 -f rom/*-r5s-emmc.img.zip nanopi-r5s/hash/ || true
-        timeout 15m aliyundrive upload --retry 10 -f rom/*-r5s-squashfs-sysupgrade.img.gz nanopi-r5s/hash/ || true
-        timeout 15m aliyundrive upload --retry 10 -f rom/*-r5s-ext4-sysupgrade.img.gz nanopi-r5s/hash/ || true
+        timeout 15m proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt nanopi-r5s/hash/ || true
+        timeout 15m proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo nanopi-r5s/hash/ || true
+        timeout 15m proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt nanopi-r5s/hash/ || true
+        timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-emmc.img.zip nanopi-r5s/hash/ || true
+        timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-squashfs-sysupgrade.img.gz nanopi-r5s/hash/ || true
+        timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-ext4-sysupgrade.img.gz nanopi-r5s/hash/ || true
 
     - name: Upload Firmware - snapshots
       id: upload-firmware
       continue-on-error: true
       run: |
         DATE=$(date "+%Y-%m-%d")
-        aliyundrive mkdir nanopi-r5s/snapshots/21.02-SNAPSHOT/$DATE
-        timeout 15m aliyundrive upload -f info/manifest.txt nanopi-r5s/snapshots/21.02-SNAPSHOT/$DATE/ || true
-        timeout 15m aliyundrive upload -f info/config.buildinfo nanopi-r5s/snapshots/21.02-SNAPSHOT/$DATE/ || true
-        timeout 15m aliyundrive upload -f info/sha256sums.txt nanopi-r5s/snapshots/21.02-SNAPSHOT/$DATE/ || true
-        timeout 15m aliyundrive upload -f rom/*-r5s-emmc.img.zip nanopi-r5s/snapshots/21.02-SNAPSHOT/$DATE/ || true
-        timeout 15m aliyundrive upload -f rom/*-r5s-squashfs-sysupgrade.img.gz nanopi-r5s/snapshots/21.02-SNAPSHOT/$DATE/ || true
-        timeout 15m aliyundrive upload -f rom/*-r5s-ext4-sysupgrade.img.gz nanopi-r5s/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        proxychains -q aliyundrive mkdir nanopi-r5s/snapshots/21.02-SNAPSHOT/$DATE
+        timeout 15m proxychains -q aliyundrive upload -f info/manifest.txt nanopi-r5s/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 15m proxychains -q aliyundrive upload -f info/config.buildinfo nanopi-r5s/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 15m proxychains -q aliyundrive upload -f info/sha256sums.txt nanopi-r5s/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 15m proxychains -q aliyundrive upload -f rom/*-r5s-emmc.img.zip nanopi-r5s/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 15m proxychains -q aliyundrive upload -f rom/*-r5s-squashfs-sysupgrade.img.gz nanopi-r5s/snapshots/21.02-SNAPSHOT/$DATE/ || true
+        timeout 15m proxychains -q aliyundrive upload -f rom/*-r5s-ext4-sysupgrade.img.gz nanopi-r5s/snapshots/21.02-SNAPSHOT/$DATE/ || true
