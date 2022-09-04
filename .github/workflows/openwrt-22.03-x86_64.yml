@@ -1,4 +1,4 @@
-name: openwrt-22.03-rc_x86_64
+name: openwrt-22.03_x86_64
 
 on:
   watch:
@@ -113,15 +113,15 @@ jobs:
         timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt-x86/hash/ || true
         timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt-x86/hash/ || true
 
-    - name: Upload Firmware - candidate
+    - name: Upload Firmware - releases
       id: upload-firmware
       continue-on-error: true
       run: |
         version=$(cat openwrt/version.txt)
-        proxychains -q aliyundrive mkdir openwrt-x86/candidate/$version
-        timeout 15m proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt openwrt-x86/candidate/$version/ || true
-        timeout 15m proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo openwrt-x86/candidate/$version/ || true
-        timeout 15m proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt-x86/candidate/$version/ || true
-        timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-generic-rootfs.tar.gz openwrt-x86/candidate/$version/ || true
-        timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt-x86/candidate/$version/ || true
-        timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt-x86/candidate/$version/ || true
+        proxychains -q aliyundrive mkdir openwrt-x86/releases/$version
+        timeout 15m proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt openwrt-x86/releases/$version/ || true
+        timeout 15m proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo openwrt-x86/releases/$version/ || true
+        timeout 15m proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt-x86/releases/$version/ || true
+        timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-generic-rootfs.tar.gz openwrt-x86/releases/$version/ || true
+        timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt-x86/releases/$version/ || true
+        timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt-x86/releases/$version/ || true
