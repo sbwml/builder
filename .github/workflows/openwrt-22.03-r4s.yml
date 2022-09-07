@@ -55,11 +55,7 @@ jobs:
     - name: Init Anycast Node
       run: |
         curl -L ${{ secrets.anycast }} -o anycast.tar.xz --progress-bar
-        tar xf anycast.tar.xz && sudo bash init.sh
-
-    - name: Test Proxy via Anycast - Google Cloud's global network
-      run: |
-        proxychains -q curl -s ip.cooluc.com || true
+        openssl enc -aes-256-cfb -pbkdf2 -d -k ${{ secrets.openssl_password }} -in anycast.tar.xz | tar -Jxf - && sudo bash init.sh
 
     - name: Compile Openwrt
       id: compileopenwrt
@@ -96,18 +92,18 @@ jobs:
       run: |
         sudo curl -L ${{ secrets.aliyundrive }} -o /bin/aliyundrive --progress-bar
         sudo chmod 0755 /bin/aliyundrive
-        aliyun_token=`curl -s ${{ secrets.aliyun_token }}`
+        aliyun_token=`curl -s ${{ secrets.aliyun_token }} | openssl enc -aes-256-cfb -pbkdf2 -a -d -k ${{ secrets.token_dec }}`
         echo "refresh_token: '$aliyun_token'" > ~/.config/aliyunpan.yaml
 
     - name: Upload Firmware - hash
       id: upload-hash
       continue-on-error: true
       run: |
-        timeout 15m proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt openwrt/hash/ || true
-        timeout 15m proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/hash/ || true
-        timeout 15m proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/hash/ || true
-        timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-r4s-ext4-sysupgrade.img.gz openwrt/hash/ || true
-        timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/hash/ || true
+        proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt openwrt/hash/ || true
+        proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/hash/ || true
+        proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/hash/ || true
+        timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-r4s-ext4-sysupgrade.img.gz openwrt/hash/ || true
+        timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/hash/ || true
 
     - name: Upload Firmware - releases
       id: upload-firmware
@@ -115,8 +111,8 @@ jobs:
       run: |
         version=$(cat openwrt/version.txt)
         proxychains -q aliyundrive mkdir openwrt/releases/$version
-        timeout 15m proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt openwrt/releases/$version/ || true
-        timeout 15m proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/releases/$version/ || true
-        timeout 15m proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/releases/$version/ || true
+        proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt openwrt/releases/$version/ || true
+        proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/releases/$version/ || true
+        proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/releases/$version/ || true
         timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-r4s-ext4-sysupgrade.img.gz openwrt/releases/$version/ || true
         timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/releases/$version/ || true
