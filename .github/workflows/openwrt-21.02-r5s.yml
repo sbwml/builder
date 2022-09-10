@@ -47,7 +47,7 @@ jobs:
       run: |
         sudo -E rm -rf /etc/apt/sources.list.d
         sudo -E apt-get update -y
-        sudo -E apt-get install -y build-essential rsync asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core p7zip p7zip-full msmtp texinfo libreadline-dev libglib2.0-dev xmlto qemu-utils upx-ucl libelf-dev autoconf automake libtool autopoint ccache curl wget vim nano python3 python3-pip python3-ply haveged lrzsz device-tree-compiler scons android-sdk-libsparse-utils android-sdk-ext4-utils proxychains-ng
+        sudo -E apt-get install -y build-essential rsync asciidoc binutils bzip2 gawk gettext git libfuse-dev libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core p7zip p7zip-full msmtp texinfo libreadline-dev libglib2.0-dev xmlto qemu-utils upx-ucl libelf-dev autoconf automake libtool autopoint ccache curl wget vim nano python3 python3-pip python3-ply haveged lrzsz device-tree-compiler scons android-sdk-libsparse-utils android-sdk-ext4-utils proxychains-ng
         echo "deb http://archive.ubuntu.com/ubuntu/ bionic-security main" | sudo tee -a /etc/apt/sources.list
         sudo -E apt-get update
         sudo -E apt-cache policy libssl1.0-dev
