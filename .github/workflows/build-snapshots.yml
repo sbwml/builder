@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    name: Build ${{ matrix.model }}
+    name: Build ${{ matrix.model }}-${{ matrix.tag.version }}
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
@@ -16,8 +16,10 @@ jobs:
           - nanopi-r5s
           - x86_64
         tag:
-          - dev
-          - dev2
+          - type: dev
+            version: openwrt-21.02
+          - type: dev2
+            version: openwrt-22.03
 
     steps:
     - name: Checkout
@@ -75,11 +77,11 @@ jobs:
       id: compileopenwrt
       run: |
         if [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
-          bash <(curl -sS ${{ secrets.script_url_nanopi_r5s }}) ${{ matrix.tag }}
+          bash <(curl -sS ${{ secrets.script_url_nanopi_r5s }}) ${{ matrix.tag.type }}
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
-          bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag }} x86
+          bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} x86
         else
-          bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag }}
+          bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }}
         fi
         build_date=$(date "+%Y-%m-%d")
         echo "build_date=$build_date" >> $GITHUB_ENV
@@ -153,9 +155,9 @@ jobs:
       continue-on-error: true
       run: |
         DATE=$(date "+%Y-%m-%d")
-        if [ "${{ matrix.tag }}" = "dev" ]; then
+        if [ "${{ matrix.tag.type }}" = "dev" ]; then
           branch=21.02-SNAPSHOT
-        elif [ "${{ matrix.tag }}" = "dev2" ]; then
+        elif [ "${{ matrix.tag.type }}" = "dev2" ]; then
           branch=22.03-SNAPSHOT
         fi
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
