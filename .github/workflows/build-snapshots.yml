@@ -110,9 +110,9 @@ jobs:
         fi
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
-        name: ${{ env.build_date }}
+        name: ${{ env.build_date }}-${{ matrix.model }}-${{ matrix.tag.version }}
         path: rom/*.gz
 
     - name: Install AliyunDrive CLI
