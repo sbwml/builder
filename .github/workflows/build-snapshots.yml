@@ -135,19 +135,19 @@ jobs:
           timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-r4s-ext4-sysupgrade.img.gz openwrt/hash/ || true
           timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/hash/ || true
         elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
-          proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt nanopi-r5s/hash/ || true
-          proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo nanopi-r5s/hash/ || true
-          proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt nanopi-r5s/hash/ || true
-          timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-emmc.img.zip nanopi-r5s/hash/ || true
-          timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-squashfs-sysupgrade.img.gz nanopi-r5s/hash/ || true
-          timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-ext4-sysupgrade.img.gz nanopi-r5s/hash/ || true
+          proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt openwrt/hash/ || true
+          proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/hash/ || true
+          proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/hash/ || true
+          timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-emmc.img.zip openwrt/hash/ || true
+          timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-squashfs-sysupgrade.img.gz openwrt/hash/ || true
+          timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-ext4-sysupgrade.img.gz openwrt/hash/ || true
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
-          proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt openwrt-x86/hash/ || true
-          proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo openwrt-x86/hash/ || true
-          proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt-x86/hash/ || true
-          timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-generic-rootfs.tar.gz openwrt-x86/hash/ || true
-          timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt-x86/hash/ || true
-          timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt-x86/hash/ || true
+          proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt openwrt/hash/ || true
+          proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/hash/ || true
+          proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/hash/ || true
+          timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-generic-rootfs.tar.gz openwrt/hash/ || true
+          timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt/hash/ || true
+          timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt/hash/ || true
         fi
 
     - name: Upload Firmware - snapshots
@@ -161,26 +161,26 @@ jobs:
           branch=22.03-SNAPSHOT
         fi
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
-          proxychains -q aliyundrive mkdir openwrt/snapshots/$branch/$DATE
-          proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt openwrt/snapshots/$branch/$DATE/ || true
-          proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/snapshots/$branch/$DATE/ || true
-          proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/snapshots/$branch/$DATE/ || true
-          timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-r4s-ext4-sysupgrade.img.gz openwrt/snapshots/$branch/$DATE/ || true
-          timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/snapshots/$branch/$DATE/ || true
+          proxychains -q aliyundrive mkdir openwrt/nanopi-r4s/snapshots/$branch/$DATE
+          proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt openwrt/nanopi-r4s/snapshots/$branch/$DATE/ || true
+          proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/nanopi-r4s/snapshots/$branch/$DATE/ || true
+          proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/nanopi-r4s/snapshots/$branch/$DATE/ || true
+          timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-r4s-ext4-sysupgrade.img.gz openwrt/nanopi-r4s/snapshots/$branch/$DATE/ || true
+          timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/nanopi-r4s/snapshots/$branch/$DATE/ || true
         elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
-          proxychains -q aliyundrive mkdir nanopi-r5s/snapshots/$branch/$DATE
-          proxychains -q aliyundrive upload -f info/manifest.txt nanopi-r5s/snapshots/$branch/$DATE/ || true
-          proxychains -q aliyundrive upload -f info/config.buildinfo nanopi-r5s/snapshots/$branch/$DATE/ || true
-          proxychains -q aliyundrive upload -f info/sha256sums.txt nanopi-r5s/snapshots/$branch/$DATE/ || true
-          timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-emmc.img.zip nanopi-r5s/snapshots/$branch/$DATE/ || true
-          timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-squashfs-sysupgrade.img.gz nanopi-r5s/snapshots/$branch/$DATE/ || true
-          timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-ext4-sysupgrade.img.gz nanopi-r5s/snapshots/$branch/$DATE/ || true
+          proxychains -q aliyundrive mkdir openwrt/nanopi-r5s/snapshots/$branch/$DATE
+          proxychains -q aliyundrive upload -f info/manifest.txt openwrt/nanopi-r5s/snapshots/$branch/$DATE/ || true
+          proxychains -q aliyundrive upload -f info/config.buildinfo openwrt/nanopi-r5s/snapshots/$branch/$DATE/ || true
+          proxychains -q aliyundrive upload -f info/sha256sums.txt openwrt/nanopi-r5s/snapshots/$branch/$DATE/ || true
+          timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-emmc.img.zip openwrt/nanopi-r5s/snapshots/$branch/$DATE/ || true
+          timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/snapshots/$branch/$DATE/ || true
+          timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/snapshots/$branch/$DATE/ || true
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
-          proxychains -q aliyundrive mkdir openwrt-x86/snapshots/$branch/$DATE
-          proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt openwrt-x86/snapshots/$branch/$DATE/ || true
-          proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo openwrt-x86/snapshots/$branch/$DATE/ || true
-          proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt-x86/snapshots/$branch/$DATE/ || true
-          timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-generic-rootfs.tar.gz openwrt-x86/snapshots/$branch/$DATE/ || true
-          timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt-x86/snapshots/$branch/$DATE/ || true
-          timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt-x86/snapshots/$branch/$DATE/ || true
+          proxychains -q aliyundrive mkdir openwrt/x86_64/snapshots/$branch/$DATE
+          proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt openwrt/x86_64/snapshots/$branch/$DATE/ || true
+          proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/x86_64/snapshots/$branch/$DATE/ || true
+          proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/x86_64/snapshots/$branch/$DATE/ || true
+          timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-generic-rootfs.tar.gz openwrt/x86_64/snapshots/$branch/$DATE/ || true
+          timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt/x86_64/snapshots/$branch/$DATE/ || true
+          timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt/x86_64/snapshots/$branch/$DATE/ || true
         fi
