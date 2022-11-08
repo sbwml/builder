@@ -30,8 +30,6 @@ jobs:
 
     - name: Show system
       run: |
-    - name: Show system
-      run: |
         lscpu
         free -h
         uname -a
