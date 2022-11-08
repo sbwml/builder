@@ -30,14 +30,11 @@ jobs:
 
     - name: Show system
       run: |
-        echo -e "Total CPU cores\t: $(nproc)"
-        cat /proc/cpuinfo | grep 'model name'
+    - name: Show system
+      run: |
+        lscpu
         free -h
         uname -a
-        [ -f /proc/version ] && cat /proc/version
-        [ -f /etc/issue.net ] && cat /etc/issue.net
-        [ -f /etc/issue ] && cat /etc/issue
-        ulimit -a
 
     - name: Free disk space
       run: |
