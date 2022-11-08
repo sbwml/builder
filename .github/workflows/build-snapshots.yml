@@ -41,10 +41,12 @@ jobs:
         sudo -E docker image prune -a -f
         sudo -E systemctl stop docker
         sudo -E snap set system refresh.retain=2
-        sudo -E apt-get -y purge dotnet* firefox gcc-10* ghc* google* hhvm llvm* mono* mysql* openjdk* php* zulu*
+        sudo -E apt-get -y purge dotnet* firefox clang* gcc-10* ghc* google* hhvm llvm* mono* mongo* mysql* openjdk* php* zulu*
         sudo -E apt-get -y autoremove --purge
         sudo -E apt-get clean
-        sudo -E rm -rf /etc/mysql /etc/php /opt/az /opt/hostedtoolcache /usr/lib/jvm /usr/local/* /usr/local/.ghcup /usr/local/lib/android/sdk /usr/local/share/boost /usr/share/az* /usr/share/dotnet /usr/share/swift /usr/src/* /var/lib/docker /var/lib/gems /var/lib/mysql /var/lib/snapd /usr/local/bin/vcpkg
+        sudo -E rm -rf /etc/mysql /etc/php /usr/lib/jvm /usr/libexec/docker /usr/local /usr/src/* /var/lib/docker /var/lib/gems /var/lib/mysql /var/lib/snapd /etc/skel /opt/{microsoft,az,hostedtoolcache,cni,mssql-tools,pipx} /usr/share/{az*,dotnet,swift,miniconda,gradle*,java,kotlinc,ri,sbt} /root/{.sbt,.local,.npm}
+        sudo sed -i '/NVM_DIR/d;/skel/d' /root/{.bashrc,.profile}
+        rm -rf ~/{.cargo,.dotnet,.rustup}
         [ -n "$AGENT_TOOLSDIRECTORY" ] && sudo rm -rf "$AGENT_TOOLSDIRECTORY"
         df -h
 
