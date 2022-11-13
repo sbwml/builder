@@ -38,6 +38,12 @@ jobs:
         free -h
         uname -a
 
+    - name: Set release env
+      run: |
+        if [[ ${{ matrix.model }} == "nanopi-r5s-mainline" ]]; then
+          echo "release=false" >> "$GITHUB_ENV"
+        fi
+
     - name: Free disk space
       run: |
         sudo -E swapoff -a
@@ -119,8 +125,8 @@ jobs:
         fi
 
     - name: Create release
+      if: env.release != 'false'
       id: create_release
-      if: ${{ matrix.model }} != "nanopi-r5s-mainline"
       uses: ncipollo/release-action@v1.11.1
       with:
         name: OpenWRT-${{ env.latest_release }}
