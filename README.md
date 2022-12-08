@@ -2,10 +2,10 @@
 
 ## OpenWRT for X86_64 & NanoPi R4S/R5S
 
-## Info: 
+## Firmware download: 
 
-https://r4s.cooluc.com
+NanoPi R4S: https://r4s.cooluc.com
 
-https://r5s.cooluc.com
+NanoPi R5S: : https://r5s.cooluc.com
 
-https://x86.cooluc.com
+X86_64: https://x86.cooluc.com
