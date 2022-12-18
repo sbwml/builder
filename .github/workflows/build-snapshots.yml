@@ -13,7 +13,6 @@ jobs:
       matrix:
         model:
           - nanopi-r4s
-          - nanopi-r5s
           - nanopi-r5s-mainline
           - x86_64
         tag:

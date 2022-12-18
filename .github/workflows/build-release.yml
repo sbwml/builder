@@ -14,7 +14,6 @@ jobs:
       matrix:
         model:
           - nanopi-r4s
-          - nanopi-r5s
           - nanopi-r5s-mainline
           - x86_64
         tag:
@@ -40,7 +39,7 @@ jobs:
 
     - name: Set release env
       run: |
-        if [[ ${{ matrix.model }} == "nanopi-r5s-mainline" ]]; then
+        if [[ ${{ matrix.model }} == "nanopi-r5s" ]]; then
           echo "release=false" >> "$GITHUB_ENV"
         fi
 
