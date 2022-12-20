@@ -13,7 +13,7 @@ jobs:
       matrix:
         model:
           - nanopi-r4s
-          - nanopi-r5s-mainline
+          - nanopi-r5s
           - x86_64
         tag:
           - type: dev
@@ -21,7 +21,7 @@ jobs:
           - type: dev2
             version: openwrt-22.03
         exclude:
-          - { model: nanopi-r5s-mainline, tag: { type: dev, version: openwrt-21.02 } }
+          - { model: nanopi-r5s, tag: { type: dev, version: openwrt-21.02 } }
 
     steps:
     - name: Checkout
@@ -76,8 +76,6 @@ jobs:
       id: compileopenwrt
       run: |
         if [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
-          bash <(curl -sS ${{ secrets.script_url_nanopi_r5s }}) ${{ matrix.tag.type }}
-        elif [ "${{ matrix.model }}" = "nanopi-r5s-mainline" ]; then
           bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} r5s
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
           bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} x86
@@ -97,11 +95,6 @@ jobs:
           cp -a openwrt/bin/targets/rockchip/armv8/config.buildinfo info/config.buildinfo
           cd rom && sha256sum *gz > ../info/sha256sums.txt
         elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
-          cp -a rk356x_tools/out/*.gz rom/
-          cp -a rk356x_tools/out/*.zip rom/
-          cp -a rk356x_tools/out/*.txt info/
-          cp -a rk356x_tools/out/*.buildinfo info/
-        elif [ "${{ matrix.model }}" = "nanopi-r5s-mainline" ]; then
           cp -a openwrt/bin/targets/rockchip/armv8/*.img.gz rom/
           cp -a openwrt/bin/targets/rockchip/armv8/*-r5s.manifest info/manifest.txt
           cp -a openwrt/bin/targets/rockchip/armv8/config.buildinfo info/config.buildinfo
@@ -144,13 +137,6 @@ jobs:
           proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt openwrt/hash/ || true
           proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/hash/ || true
           proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/hash/ || true
-          timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-emmc.img.zip openwrt/hash/ || true
-          timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-squashfs-sysupgrade.img.gz openwrt/hash/ || true
-          timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-ext4-sysupgrade.img.gz openwrt/hash/ || true
-        elif [ "${{ matrix.model }}" = "nanopi-r5s-mainline" ]; then
-          proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt openwrt/hash/ || true
-          proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/hash/ || true
-          proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/hash/ || true
           timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-ext4-sysupgrade.img.gz openwrt/hash/ || true
           timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-squashfs-sysupgrade.img.gz openwrt/hash/ || true
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
@@ -180,14 +166,6 @@ jobs:
           timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-r4s-ext4-sysupgrade.img.gz openwrt/nanopi-r4s/snapshots/$branch/$DATE/ || true
           timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/nanopi-r4s/snapshots/$branch/$DATE/ || true
         elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
-          proxychains -q aliyundrive mkdir openwrt/nanopi-r5s/snapshots/$branch/$DATE
-          proxychains -q aliyundrive upload -f info/manifest.txt openwrt/nanopi-r5s/snapshots/$branch/$DATE/ || true
-          proxychains -q aliyundrive upload -f info/config.buildinfo openwrt/nanopi-r5s/snapshots/$branch/$DATE/ || true
-          proxychains -q aliyundrive upload -f info/sha256sums.txt openwrt/nanopi-r5s/snapshots/$branch/$DATE/ || true
-          timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-emmc.img.zip openwrt/nanopi-r5s/snapshots/$branch/$DATE/ || true
-          timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/snapshots/$branch/$DATE/ || true
-          timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/snapshots/$branch/$DATE/ || true
-        elif [ "${{ matrix.model }}" = "nanopi-r5s-mainline" ]; then
           proxychains -q aliyundrive mkdir openwrt/nanopi-r5s/mainline/snapshots/$branch/$DATE
           proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt openwrt/nanopi-r5s/mainline/snapshots/$branch/$DATE/ || true
           proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/nanopi-r5s/mainline/snapshots/$branch/$DATE/ || true
