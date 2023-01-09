@@ -42,6 +42,9 @@ jobs:
         if [[ ${{ matrix.model }} == "null" ]]; then
           echo "release=false" >> "$GITHUB_ENV"
         fi
+        if [[ ${{ matrix.model }} == "nanopi-r4s" ]] || [[ ${{ matrix.model }} == "nanopi-r5s" ]] && [[ ${{ matrix.tag.type }} == "rc" ]]; then
+          echo "release_ota=true" >> "$GITHUB_ENV"
+        fi
 
     - name: Free disk space
       run: |
@@ -192,3 +195,16 @@ jobs:
           timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/ || true
           timeout 15m proxychains -q aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/ || true
         fi
+
+    - name: Release OTA
+      if: env.release_ota == 'true'
+      id: release_ota
+      uses: ncipollo/release-action@v1.11.1
+      with:
+        name: OpenWRT-${{ env.latest_release }}
+        allowUpdates: true
+        tag: ${{ env.latest_release }}
+        commit: master
+        replacesArtifacts: true
+        token: ${{ secrets.workflow_token }}
+        artifacts: openwrt/fw.json
