@@ -101,21 +101,21 @@ jobs:
       run: |
         mkdir -p rom info
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
-          cp -a openwrt/bin/targets/rockchip/armv8/*.img.gz rom/
-          cp -a openwrt/bin/targets/rockchip/armv8/*-r4s.manifest info/manifest.txt
-          cp -a openwrt/bin/targets/rockchip/armv8/config.buildinfo info/config.buildinfo
+          cp -a openwrt/bin/targets/rockchip/*/*.img.gz rom/
+          cp -a openwrt/bin/targets/rockchip/*/*-r4s.manifest info/manifest.txt
+          cp -a openwrt/bin/targets/rockchip/*/config.buildinfo info/config.buildinfo
           cd rom && sha256sum *gz > ../info/sha256sums.txt
         elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
-          cp -a openwrt/bin/targets/rockchip/armv8/*.img.gz rom/
-          cp -a openwrt/bin/targets/rockchip/armv8/*-r5s.manifest info/manifest.txt
-          cp -a openwrt/bin/targets/rockchip/armv8/config.buildinfo info/config.buildinfo
+          cp -a openwrt/bin/targets/rockchip/*/*.img.gz rom/
+          cp -a openwrt/bin/targets/rockchip/*/*-r5s.manifest info/manifest.txt
+          cp -a openwrt/bin/targets/rockchip/*/config.buildinfo info/config.buildinfo
           cd rom && sha256sum *gz > ../info/sha256sums.txt
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
-          cp -a openwrt/bin/targets/x86/64/*-ext4-combined-efi.img.gz rom/
-          cp -a openwrt/bin/targets/x86/64/*-squashfs-combined-efi.img.gz rom/
-          cp -a openwrt/bin/targets/x86/64/*-generic-rootfs.tar.gz rom/
-          cp -a openwrt/bin/targets/x86/64/*-x86-64-generic.manifest info/manifest.txt
-          cp -a openwrt/bin/targets/x86/64/config.buildinfo info/config.buildinfo
+          cp -a openwrt/bin/targets/x86/*/*-ext4-combined-efi.img.gz rom/
+          cp -a openwrt/bin/targets/x86/*/*-squashfs-combined-efi.img.gz rom/
+          cp -a openwrt/bin/targets/x86/*/*-generic-rootfs.tar.gz rom/
+          cp -a openwrt/bin/targets/x86/*/*-x86-64-generic.manifest info/manifest.txt
+          cp -a openwrt/bin/targets/x86/*/config.buildinfo info/config.buildinfo
           cd rom && sha256sum *gz > ../info/sha256sums.txt
         fi
 
