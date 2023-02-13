@@ -45,6 +45,9 @@ jobs:
         if [[ ${{ matrix.model }} == "nanopi-r4s" ]] || [[ ${{ matrix.model }} == "nanopi-r5s" ]] && [[ ${{ matrix.tag.type }} == "rc" ]]; then
           echo "release_ota=true" >> "$GITHUB_ENV"
         fi
+        if [[ ${{ matrix.model }} == "nanopi-r5s" ]] && [[ ${{ matrix.tag.type }} == "rc" ]]; then
+          echo "release_kmod=true" >> "$GITHUB_ENV"
+        fi
 
     - name: Free disk space
       run: |
@@ -132,6 +135,19 @@ jobs:
         replacesArtifacts: true
         token: ${{ secrets.workflow_token }}
         artifacts: rom/*
+
+    - name: Release kmods
+      if: env.release_kmod == 'true'
+      id: release_kmod
+      uses: ncipollo/release-action@v1.11.1
+      with:
+        name: OpenWRT-${{ env.latest_release }}
+        allowUpdates: true
+        tag: ${{ env.latest_release }}
+        commit: master
+        replacesArtifacts: true
+        token: ${{ secrets.workflow_token }}
+        artifacts: openwrt/kmod-*.tar.gz
 
     - name: Install AliyunDrive CLI
       id: aliyundrive
