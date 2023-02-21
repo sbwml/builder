@@ -77,10 +77,12 @@ jobs:
       id: compileopenwrt
       run: |
         if [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
+          [ "${{ matrix.tag.type }}" = "dev2" ] && KERNEL_TESTING=1
           bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} r5s
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
           bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} x86
         else
+          [ "${{ matrix.tag.type }}" = "dev2" ] && KERNEL_TESTING=1
           bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }}
         fi
         build_date=$(date "+%Y-%m-%d")
