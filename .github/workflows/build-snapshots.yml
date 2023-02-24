@@ -16,12 +16,8 @@ jobs:
           - nanopi-r5s
           - x86_64
         tag:
-          - type: dev
-            version: openwrt-21.02
           - type: dev2
             version: openwrt-22.03
-        exclude:
-          - { model: nanopi-r5s, tag: { type: dev, version: openwrt-21.02 } }
 
     steps:
     - name: Checkout
