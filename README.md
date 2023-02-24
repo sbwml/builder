@@ -6,6 +6,6 @@
 
 NanoPi R4S: https://r4s.cooluc.com
 
-NanoPi R5S: https://r5s.cooluc.com
+NanoPi R5S/R5C: https://r5s.cooluc.com
 
 X86_64: https://x86.cooluc.com
