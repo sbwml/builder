@@ -1,6 +1,6 @@
 # GitHub Actions Building
 
-## OpenWRT for X86_64 & NanoPi R4S/R5S
+## OpenWRT for X86_64 & NanoPi R4S/R5S/R5C
 
 ## Firmware download: 
 
