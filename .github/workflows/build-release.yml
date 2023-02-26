@@ -194,14 +194,14 @@ jobs:
           proxychains -q aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
         elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
           version=$(cat openwrt/version.txt)
-          proxychains -q aliyundrive mkdir openwrt/nanopi-r5s/mainline/releases/${{ matrix.tag.version }}/$version || true
-          proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt openwrt/nanopi-r5s/mainline/releases/${{ matrix.tag.version }}/$version/ || true
-          proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/nanopi-r5s/mainline/releases/${{ matrix.tag.version }}/$version/ || true
-          proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/nanopi-r5s/mainline/releases/${{ matrix.tag.version }}/$version/ || true
-          proxychains -q aliyundrive upload --retry 10 -f rom/*-r5c-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/mainline/releases/${{ matrix.tag.version }}/$version/
-          proxychains -q aliyundrive upload --retry 10 -f rom/*-r5c-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/mainline/releases/${{ matrix.tag.version }}/$version/
-          proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/mainline/releases/${{ matrix.tag.version }}/$version/
-          proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/mainline/releases/${{ matrix.tag.version }}/$version/
+          proxychains -q aliyundrive mkdir openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version || true
+          proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/ || true
+          proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/ || true
+          proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/ || true
+          proxychains -q aliyundrive upload --retry 10 -f rom/*-r5c-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          proxychains -q aliyundrive upload --retry 10 -f rom/*-r5c-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
           version=$(cat openwrt/version.txt)
           proxychains -q aliyundrive mkdir openwrt/x86_64/releases/${{ matrix.tag.version }}/$version || true
