@@ -159,43 +159,43 @@ jobs:
       continue-on-error: true
       run: |
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
-          proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt openwrt/hash/ || true
+          aliyundrive upload --retry 10 -f info/manifest.txt openwrt/hash/ || true
           sleep 3
-          proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/hash/ || true
+          aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/hash/ || true
           sleep 3
-          proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/hash/ || true
+          aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/hash/ || true
           sleep 3
-          timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-r4s-ext4-sysupgrade.img.gz openwrt/hash/ || true
+          timeout 20m aliyundrive upload --retry 10 -f rom/*-r4s-ext4-sysupgrade.img.gz openwrt/hash/ || true
           sleep 3
-          timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/hash/ || true
+          timeout 20m aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/hash/ || true
           sleep 3
         elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
-          proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt openwrt/hash/ || true
+          aliyundrive upload --retry 10 -f info/manifest.txt openwrt/hash/ || true
           sleep 3
-          proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/hash/ || true
+          aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/hash/ || true
           sleep 3
-          proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/hash/ || true
+          aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/hash/ || true
           sleep 3
-          timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5c-ext4-sysupgrade.img.gz openwrt/hash/ || true
+          timeout 20m aliyundrive upload --retry 10 -f rom/*-r5c-ext4-sysupgrade.img.gz openwrt/hash/ || true
           sleep 3
-          timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5c-squashfs-sysupgrade.img.gz openwrt/hash/ || true
+          timeout 20m aliyundrive upload --retry 10 -f rom/*-r5c-squashfs-sysupgrade.img.gz openwrt/hash/ || true
           sleep 3
-          timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-ext4-sysupgrade.img.gz openwrt/hash/ || true
+          timeout 20m aliyundrive upload --retry 10 -f rom/*-r5s-ext4-sysupgrade.img.gz openwrt/hash/ || true
           sleep 3
-          timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-squashfs-sysupgrade.img.gz openwrt/hash/ || true
+          timeout 20m aliyundrive upload --retry 10 -f rom/*-r5s-squashfs-sysupgrade.img.gz openwrt/hash/ || true
           sleep 3
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
-          proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt openwrt/hash/ || true
+          aliyundrive upload --retry 10 -f info/manifest.txt openwrt/hash/ || true
           sleep 3
-          proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/hash/ || true
+          aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/hash/ || true
           sleep 3
-          proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/hash/ || true
+          aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/hash/ || true
           sleep 3
-          timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-generic-rootfs.tar.gz openwrt/hash/ || true
+          timeout 20m aliyundrive upload --retry 10 -f rom/*-generic-rootfs.tar.gz openwrt/hash/ || true
           sleep 3
-          timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt/hash/ || true
+          timeout 20m aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt/hash/ || true
           sleep 3
-          timeout 20m proxychains -q aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt/hash/ || true
+          timeout 20m aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt/hash/ || true
           sleep 3
         fi
     - name: Upload Firmware - releases
@@ -204,49 +204,49 @@ jobs:
       run: |
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
           version=$(cat openwrt/version.txt)
-          proxychains -q aliyundrive mkdir openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version || true
+          aliyundrive mkdir openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version || true
           sleep 3
-          proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/ || true
+          aliyundrive upload --retry 10 -f info/manifest.txt openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/ || true
           sleep 3
-          proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/ || true
+          aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/ || true
           sleep 3
-          proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/ || true
+          aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/ || true
           sleep 3
-          proxychains -q aliyundrive upload --retry 10 -f rom/*-r4s-ext4-sysupgrade.img.gz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
+          aliyundrive upload --retry 10 -f rom/*-r4s-ext4-sysupgrade.img.gz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
           sleep 3
-          proxychains -q aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
+          aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
         elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
           version=$(cat openwrt/version.txt)
-          proxychains -q aliyundrive mkdir openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version || true
+          aliyundrive mkdir openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version || true
           sleep 3
-          proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/ || true
+          aliyundrive upload --retry 10 -f info/manifest.txt openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/ || true
           sleep 3
-          proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/ || true
+          aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/ || true
           sleep 3
-          proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/ || true
+          aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/ || true
           sleep 3
-          proxychains -q aliyundrive upload --retry 10 -f rom/*-r5c-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          aliyundrive upload --retry 10 -f rom/*-r5c-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
           sleep 3
-          proxychains -q aliyundrive upload --retry 10 -f rom/*-r5c-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          aliyundrive upload --retry 10 -f rom/*-r5c-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
           sleep 3
-          proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          aliyundrive upload --retry 10 -f rom/*-r5s-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
           sleep 3
-          proxychains -q aliyundrive upload --retry 10 -f rom/*-r5s-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          aliyundrive upload --retry 10 -f rom/*-r5s-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
           version=$(cat openwrt/version.txt)
-          proxychains -q aliyundrive mkdir openwrt/x86_64/releases/${{ matrix.tag.version }}/$version || true
+          aliyundrive mkdir openwrt/x86_64/releases/${{ matrix.tag.version }}/$version || true
           sleep 3
-          proxychains -q aliyundrive upload --retry 10 -f info/manifest.txt openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/ || true
+          aliyundrive upload --retry 10 -f info/manifest.txt openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/ || true
           sleep 3
-          proxychains -q aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/ || true
+          aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/ || true
           sleep 3
-          proxychains -q aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/ || true
+          aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/ || true
           sleep 3
-          proxychains -q aliyundrive upload --retry 10 -f rom/*-generic-rootfs.tar.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/ || true
+          aliyundrive upload --retry 10 -f rom/*-generic-rootfs.tar.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/ || true
           sleep 3
-          proxychains -q aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
+          aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
           sleep 3
-          proxychains -q aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
+          aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
         fi
 
     - name: Release OTA
