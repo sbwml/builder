@@ -204,8 +204,6 @@ jobs:
       run: |
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
           version=$(cat openwrt/version.txt)
-          aliyundrive mkdir openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version || true
-          sleep 3
           aliyundrive upload --retry 10 -f info/manifest.txt openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/ || true
           sleep 3
           aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/ || true
@@ -217,8 +215,6 @@ jobs:
           aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
         elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
           version=$(cat openwrt/version.txt)
-          aliyundrive mkdir openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version || true
-          sleep 3
           aliyundrive upload --retry 10 -f info/manifest.txt openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/ || true
           sleep 3
           aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/ || true
@@ -234,8 +230,6 @@ jobs:
           aliyundrive upload --retry 10 -f rom/*-r5s-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
           version=$(cat openwrt/version.txt)
-          aliyundrive mkdir openwrt/x86_64/releases/${{ matrix.tag.version }}/$version || true
-          sleep 3
           aliyundrive upload --retry 10 -f info/manifest.txt openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/ || true
           sleep 3
           aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/ || true
