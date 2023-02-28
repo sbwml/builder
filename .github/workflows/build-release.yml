@@ -154,56 +154,12 @@ jobs:
         aliyun_token=`curl -s ${{ secrets.aliyun_token }} | openssl enc -aes-256-cfb -pbkdf2 -a -d -k ${{ secrets.token_dec }}`
         echo "refresh_token: '$aliyun_token'" > ~/.config/aliyunpan.yaml
 
-    - name: Upload Firmware - hash
-      id: upload-hash
-      continue-on-error: true
-      run: |
-        if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
-          aliyundrive upload --retry 10 -f info/manifest.txt openwrt/hash/ || true
-          sleep 3
-          aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/hash/ || true
-          sleep 3
-          aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/hash/ || true
-          sleep 3
-          timeout 20m aliyundrive upload --retry 10 -f rom/*-r4s-ext4-sysupgrade.img.gz openwrt/hash/ || true
-          sleep 3
-          timeout 20m aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/hash/ || true
-          sleep 3
-        elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
-          aliyundrive upload --retry 10 -f info/manifest.txt openwrt/hash/ || true
-          sleep 3
-          aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/hash/ || true
-          sleep 3
-          aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/hash/ || true
-          sleep 3
-          timeout 20m aliyundrive upload --retry 10 -f rom/*-r5c-ext4-sysupgrade.img.gz openwrt/hash/ || true
-          sleep 3
-          timeout 20m aliyundrive upload --retry 10 -f rom/*-r5c-squashfs-sysupgrade.img.gz openwrt/hash/ || true
-          sleep 3
-          timeout 20m aliyundrive upload --retry 10 -f rom/*-r5s-ext4-sysupgrade.img.gz openwrt/hash/ || true
-          sleep 3
-          timeout 20m aliyundrive upload --retry 10 -f rom/*-r5s-squashfs-sysupgrade.img.gz openwrt/hash/ || true
-          sleep 3
-        elif [ "${{ matrix.model }}" = "x86_64" ]; then
-          aliyundrive upload --retry 10 -f info/manifest.txt openwrt/hash/ || true
-          sleep 3
-          aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/hash/ || true
-          sleep 3
-          aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/hash/ || true
-          sleep 3
-          timeout 20m aliyundrive upload --retry 10 -f rom/*-generic-rootfs.tar.gz openwrt/hash/ || true
-          sleep 3
-          timeout 20m aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt/hash/ || true
-          sleep 3
-          timeout 20m aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt/hash/ || true
-          sleep 3
-        fi
     - name: Upload Firmware - releases
       id: upload-firmware
       continue-on-error: true
       run: |
+        version=$(cat openwrt/version.txt)
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
-          version=$(cat openwrt/version.txt)
           aliyundrive upload --retry 10 -f info/manifest.txt openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/ || true
           sleep 3
           aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/ || true
@@ -214,7 +170,6 @@ jobs:
           sleep 3
           aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
         elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
-          version=$(cat openwrt/version.txt)
           aliyundrive upload --retry 10 -f info/manifest.txt openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/ || true
           sleep 3
           aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/ || true
@@ -229,7 +184,6 @@ jobs:
           sleep 3
           aliyundrive upload --retry 10 -f rom/*-r5s-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
-          version=$(cat openwrt/version.txt)
           aliyundrive upload --retry 10 -f info/manifest.txt openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/ || true
           sleep 3
           aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/ || true
