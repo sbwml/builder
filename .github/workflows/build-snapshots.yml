@@ -113,61 +113,47 @@ jobs:
         name: ${{ env.build_date }}-${{ matrix.model }}-${{ matrix.tag.version }}
         path: rom/*.gz
 
-    - name: Install AliyunDrive CLI
-      id: aliyundrive
+    - name: Install aliyunpan & login
+      id: aliyunpan
       continue-on-error: true
       run: |
-        sudo curl -L ${{ secrets.aliyundrive }} -o /bin/aliyundrive --progress-bar
-        sudo chmod 0755 /bin/aliyundrive
+        sudo curl -L ${{ secrets.aliyunpan_go }} -o /bin/aliyunpan --progress-bar
+        sudo chmod 0755 /bin/aliyunpan
+        export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
         aliyun_token=`curl -s ${{ secrets.aliyun_token }} | openssl enc -aes-256-cfb -pbkdf2 -a -d -k ${{ secrets.token_dec }}`
-        echo "refresh_token: '$aliyun_token'" > ~/.config/aliyunpan.yaml
+        aliyunpan config set -device_id=${{ secrets.device_id }} >/dev/null 2>&1
+        echo
+        echo $aliyun_token | aliyunpan login
 
     - name: Upload Firmware - snapshots
       id: upload-firmware
       continue-on-error: true
       run: |
+        export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
         DATE=$(date "+%Y-%m-%d")
         branch=22.03-SNAPSHOT
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
-          aliyundrive mkdir openwrt/nanopi-r4s/snapshots/$branch/$DATE
-          sleep 3
-          aliyundrive upload --retry 10 -f info/manifest.txt openwrt/nanopi-r4s/snapshots/$branch/$DATE/ || true
-          sleep 3
-          aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/nanopi-r4s/snapshots/$branch/$DATE/ || true
-          sleep 3
-          aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/nanopi-r4s/snapshots/$branch/$DATE/ || true
-          sleep 3
-          timeout 15m aliyundrive upload --retry 10 -f rom/*-r4s-ext4-sysupgrade.img.gz openwrt/nanopi-r4s/snapshots/$branch/$DATE/ || true
-          sleep 3
-          timeout 15m aliyundrive upload --retry 10 -f rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/nanopi-r4s/snapshots/$branch/$DATE/ || true
+          aliyunpan mkdir openwrt/nanopi-r4s/snapshots/$branch/$DATE
+          aliyunpan upload info/manifest.txt openwrt/nanopi-r4s/snapshots/$branch/$DATE/
+          aliyunpan upload info/config.buildinfo openwrt/nanopi-r4s/snapshots/$branch/$DATE/
+          aliyunpan upload info/sha256sums.txt openwrt/nanopi-r4s/snapshots/$branch/$DATE/
+          aliyunpan upload rom/*-r4s-ext4-sysupgrade.img.gz openwrt/nanopi-r4s/snapshots/$branch/$DATE/
+          aliyunpan upload rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/nanopi-r4s/snapshots/$branch/$DATE/
         elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
-          aliyundrive mkdir openwrt/nanopi-r5s/snapshots/$branch/$DATE
-          sleep 3
-          aliyundrive upload --retry 10 -f info/manifest.txt openwrt/nanopi-r5s/snapshots/$branch/$DATE/ || true
-          sleep 3
-          aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/nanopi-r5s/snapshots/$branch/$DATE/ || true
-          sleep 3
-          aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/nanopi-r5s/snapshots/$branch/$DATE/ || true
-          sleep 3
-          timeout 15m aliyundrive upload --retry 10 -f rom/*-r5c-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/snapshots/$branch/$DATE/ || true
-          sleep 3
-          timeout 15m aliyundrive upload --retry 10 -f rom/*-r5c-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/snapshots/$branch/$DATE/ || true
-          sleep 3
-          timeout 15m aliyundrive upload --retry 10 -f rom/*-r5s-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/snapshots/$branch/$DATE/ || true
-          sleep 3
-          timeout 15m aliyundrive upload --retry 10 -f rom/*-r5s-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/snapshots/$branch/$DATE/ || true
+          aliyunpan mkdir openwrt/nanopi-r5s/snapshots/$branch/$DATE
+          aliyunpan upload info/manifest.txt openwrt/nanopi-r5s/snapshots/$branch/$DATE/
+          aliyunpan upload info/config.buildinfo openwrt/nanopi-r5s/snapshots/$branch/$DATE/
+          aliyunpan upload info/sha256sums.txt openwrt/nanopi-r5s/snapshots/$branch/$DATE/
+          aliyunpan upload rom/*-r5c-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/snapshots/$branch/$DATE/
+          aliyunpan upload rom/*-r5c-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/snapshots/$branch/$DATE/
+          aliyunpan upload rom/*-r5s-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/snapshots/$branch/$DATE/
+          aliyunpan upload rom/*-r5s-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/snapshots/$branch/$DATE/
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
-          aliyundrive mkdir openwrt/x86_64/snapshots/$branch/$DATE
-          sleep 3
-          aliyundrive upload --retry 10 -f info/manifest.txt openwrt/x86_64/snapshots/$branch/$DATE/ || true
-          sleep 3
-          aliyundrive upload --retry 10 -f info/config.buildinfo openwrt/x86_64/snapshots/$branch/$DATE/ || true
-          sleep 3
-          aliyundrive upload --retry 10 -f info/sha256sums.txt openwrt/x86_64/snapshots/$branch/$DATE/ || true
-          sleep 3
-          timeout 15m aliyundrive upload --retry 10 -f rom/*-generic-rootfs.tar.gz openwrt/x86_64/snapshots/$branch/$DATE/ || true
-          sleep 3
-          timeout 15m aliyundrive upload --retry 10 -f rom/*-ext4-combined-efi.img.gz openwrt/x86_64/snapshots/$branch/$DATE/ || true
-          sleep 3
-          timeout 15m aliyundrive upload --retry 10 -f rom/*-squashfs-combined-efi.img.gz openwrt/x86_64/snapshots/$branch/$DATE/ || true
+          aliyunpan mkdir openwrt/x86_64/snapshots/$branch/$DATE
+          aliyunpan upload info/manifest.txt openwrt/x86_64/snapshots/$branch/$DATE/
+          aliyunpan upload info/config.buildinfo openwrt/x86_64/snapshots/$branch/$DATE/
+          aliyunpan upload info/sha256sums.txt openwrt/x86_64/snapshots/$branch/$DATE/
+          aliyunpan upload rom/*-generic-rootfs.tar.gz openwrt/x86_64/snapshots/$branch/$DATE/
+          aliyunpan upload rom/*-ext4-combined-efi.img.gz openwrt/x86_64/snapshots/$branch/$DATE/
+          aliyunpan upload rom/*-squashfs-combined-efi.img.gz openwrt/x86_64/snapshots/$branch/$DATE/
         fi
