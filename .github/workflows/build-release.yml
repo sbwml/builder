@@ -164,65 +164,26 @@ jobs:
         export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
         version=$(cat openwrt/version.txt)
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
-          aliyunpan mkdir openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version
-          
-          aliyunpan rm openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/manifest.txt
-          aliyunpan upload info/manifest.txt openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
-          
-          aliyunpan rm openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/config.buildinfo
-          aliyunpan upload info/config.buildinfo openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
-          
-          aliyunpan rm openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/sha256sums.txt
-          aliyunpan upload info/sha256sums.txt openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
-          
-          aliyunpan rm openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/*-r4s-ext4-sysupgrade.img.gz
-          aliyunpan upload rom/*-r4s-ext4-sysupgrade.img.gz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
-          
-          aliyunpan rm openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/*-r4s-squashfs-sysupgrade.img.gz
-          aliyunpan upload rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload -ow info/manifest.txt openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload -ow info/config.buildinfo openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload -ow info/sha256sums.txt openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload -ow rom/*-r4s-ext4-sysupgrade.img.gz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload -ow rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
         elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
-          aliyunpan mkdir openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version
-          
-          aliyunpan rm openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/manifest.txt
-          aliyunpan upload info/manifest.txt openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
-          
-          aliyunpan rm openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/config.buildinfo
-          aliyunpan upload info/config.buildinfo openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
-          
-          aliyunpan rm openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/sha256sums.txt
-          aliyunpan upload info/sha256sums.txt openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
-          
-          aliyunpan rm openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/*-r5c-ext4-sysupgrade.img.gz
-          aliyunpan upload rom/*-r5c-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
-          
-          aliyunpan rm openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/*-r5c-squashfs-sysupgrade.img.gz
-          aliyunpan upload rom/*-r5c-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
-          
-          aliyunpan rm openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/*-r5s-ext4-sysupgrade.img.gz
-          aliyunpan upload rom/*-r5s-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
-          
-          aliyunpan rm openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/*-r5s-squashfs-sysupgrade.img.gz
-          aliyunpan upload rom/*-r5s-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload -ow info/manifest.txt openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload -ow info/config.buildinfo openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload -ow info/sha256sums.txt openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload -ow rom/*-r5c-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload -ow rom/*-r5c-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload -ow rom/*-r5s-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload -ow rom/*-r5s-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
-          aliyunpan mkdir openwrt/x86_64/releases/${{ matrix.tag.version }}/$version
-          
-          aliyunpan rm openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/manifest.txt
-          aliyunpan upload info/manifest.txt openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
-          
-          aliyunpan rm openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/config.buildinfo
-          aliyunpan upload info/config.buildinfo openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
-          
-          aliyunpan rm openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/sha256sums.txt
-          aliyunpan upload info/sha256sums.txt openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
-          
-          aliyunpan rm openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/*-generic-rootfs.tar.gz
-          aliyunpan upload rom/*-generic-rootfs.tar.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
-          
-          aliyunpan rm openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/*-ext4-combined-efi.img.gz
-          aliyunpan upload rom/*-ext4-combined-efi.img.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
-          
-          aliyunpan rm openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/*-squashfs-combined-efi.img.gz
-          aliyunpan upload rom/*-squashfs-combined-efi.img.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload -ow info/manifest.txt openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload -ow info/config.buildinfo openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload -ow info/sha256sums.txt openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload -ow rom/*-generic-rootfs.tar.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload -ow rom/*-ext4-combined-efi.img.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload -ow rom/*-squashfs-combined-efi.img.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
         fi
 
     - name: Release OTA
