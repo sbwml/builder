@@ -8,7 +8,7 @@ jobs:
   build:
     if: github.event.repository.owner.id == github.event.sender.id
     name: Build ${{ matrix.model }}-${{ matrix.tag.version }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
@@ -47,18 +47,17 @@ jobs:
 
     - name: Free disk space
       run: |
-        sudo -E swapoff -a
-        sudo -E rm -f /swapfile
-        sudo -E docker image prune -a -f
-        sudo -E systemctl stop docker
-        sudo -E snap set system refresh.retain=2
-        sudo -E apt-get -y purge dotnet* firefox clang* gcc-10* ghc* google* hhvm llvm* mono* mongo* mysql* openjdk* php* zulu*
-        sudo -E apt-get -y autoremove --purge
-        sudo -E apt-get clean
-        sudo -E rm -rf /etc/mysql /etc/php /usr/lib/jvm /usr/libexec/docker /usr/local /usr/src/* /var/lib/docker /var/lib/gems /var/lib/mysql /var/lib/snapd /etc/skel /opt/{microsoft,az,hostedtoolcache,cni,mssql-tools,pipx} /usr/share/{az*,dotnet,swift,miniconda,gradle*,java,kotlinc,ri,sbt} /root/{.sbt,.local,.npm}
+        sudo swapoff -a
+        sudo rm -f /swapfile
+        sudo docker image prune -a -f
+        sudo systemctl stop docker
+        sudo snap set system refresh.retain=2
+        sudo apt-get -y purge dotnet* firefox clang* ghc* google* llvm* mono* mongo* mysql* openjdk* php* zulu*
+        sudo apt-get -y autoremove --purge
+        sudo apt-get clean
+        sudo rm -rf /etc/mysql /etc/php /usr/lib/jvm /usr/libexec/docker /usr/local /usr/src/* /var/lib/docker /var/lib/gems /var/lib/mysql /var/lib/snapd /etc/skel /opt/{microsoft,az,hostedtoolcache,cni,mssql-tools,pipx} /usr/share/{az*,dotnet,swift,miniconda,gradle*,java,kotlinc,ri,sbt} /root/{.sbt,.local,.npm}
         sudo sed -i '/NVM_DIR/d;/skel/d' /root/{.bashrc,.profile}
         rm -rf ~/{.cargo,.dotnet,.rustup}
-        [ -n "$AGENT_TOOLSDIRECTORY" ] && sudo rm -rf "$AGENT_TOOLSDIRECTORY"
         df -h
 
     - name: Init build dependencies
@@ -66,14 +65,10 @@ jobs:
         DEBIAN_FRONTEND: noninteractive
       run: |
         sudo sed -i 's/azure.archive.ubuntu.com/mirror.enzu.com/g' /etc/apt/sources.list
-        sudo -E rm -rf /etc/apt/sources.list.d
-        sudo -E apt-get update -y
-        sudo -E apt-get install -y build-essential rsync asciidoc binutils bzip2 gawk gettext git libfuse-dev libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core p7zip p7zip-full msmtp texinfo libreadline-dev libglib2.0-dev xmlto qemu-utils upx-ucl libelf-dev autoconf automake libtool autopoint ccache curl wget vim nano python3 python3-pip python3-ply haveged lrzsz device-tree-compiler scons android-sdk-libsparse-utils android-sdk-ext4-utils proxychains-ng
-        echo "deb http://mirror.enzu.com/ubuntu/ bionic-security main" | sudo tee -a /etc/apt/sources.list
-        sudo -E apt-get update
-        sudo -E apt-cache policy libssl1.0-dev
-        sudo -E apt-get install -y libssl1.0-dev kmod
-        sudo -E apt-get clean -y
+        sudo rm -rf /etc/apt/sources.list.d
+        sudo apt-get update
+        sudo apt-get install -y build-essential flex bison g++ gawk gcc-multilib g++-multilib gettext git libfuse-dev libncurses5-dev libssl-dev python3 python3-distutils rsync unzip zlib1g-dev file wget subversion patch upx-ucl autoconf automake curl proxychains-ng
+        sudo apt-get clean
         git config --global user.name 'GitHub Actions' && git config --global user.email 'noreply@github.com'
         df -h
 
