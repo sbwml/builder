@@ -81,7 +81,7 @@ jobs:
       id: compileopenwrt
       run: |
         if [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
-          bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} r5s
+          BUILD_SDK=y bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} r5s
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
           bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} x86
         else
@@ -99,19 +99,20 @@ jobs:
           cp -a openwrt/bin/targets/rockchip/*/*.img.gz rom/
           cp -a openwrt/bin/targets/rockchip/*/*-r4s.manifest info/manifest.txt
           cp -a openwrt/bin/targets/rockchip/*/config.buildinfo info/config.buildinfo
-          cd rom && sha256sum *gz > ../info/sha256sums.txt
+          cd rom && sha256sum * > ../info/sha256sums.txt
         elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
           cp -a openwrt/bin/targets/rockchip/*/*.img.gz rom/
           cp -a openwrt/bin/targets/rockchip/*/*.manifest info/manifest.txt
           cp -a openwrt/bin/targets/rockchip/*/config.buildinfo info/config.buildinfo
-          cd rom && sha256sum *gz > ../info/sha256sums.txt
+          cp -a openwrt/bin/targets/rockchip/*/openwrt-sdk-*.tar.xz rom/
+          cd rom && sha256sum * > ../info/sha256sums.txt
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
           cp -a openwrt/bin/targets/x86/*/*-ext4-combined-efi.img.gz rom/
           cp -a openwrt/bin/targets/x86/*/*-squashfs-combined-efi.img.gz rom/
           cp -a openwrt/bin/targets/x86/*/*-generic-rootfs.tar.gz rom/
           cp -a openwrt/bin/targets/x86/*/*-x86-64-generic.manifest info/manifest.txt
           cp -a openwrt/bin/targets/x86/*/config.buildinfo info/config.buildinfo
-          cd rom && sha256sum *gz > ../info/sha256sums.txt
+          cd rom && sha256sum * > ../info/sha256sums.txt
         fi
 
     - name: Create release
@@ -173,6 +174,7 @@ jobs:
           aliyunpan upload -ow info/manifest.txt openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
           aliyunpan upload -ow info/config.buildinfo openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
           aliyunpan upload -ow info/sha256sums.txt openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload -ow rom/openwrt-sdk-*.tar.xz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
           aliyunpan upload -ow rom/*-r5c-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
           aliyunpan upload -ow rom/*-r5c-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
           aliyunpan upload -ow rom/*-r5s-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
