@@ -112,11 +112,11 @@ jobs:
       id: aliyunpan
       run: |
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
-          device_id=${{ secrets.device_id_r4s }}
+          device_id=${{ secrets.device_id_r4s_dev }}
         elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
-          device_id=${{ secrets.device_id_r5s }}
+          device_id=${{ secrets.device_id_r5s_dev }}
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
-          device_id=${{ secrets.device_id_x86 }}
+          device_id=${{ secrets.device_id_x86_dev }}
         fi
         sudo curl -L ${{ secrets.aliyunpan_go }} -o /bin/aliyunpan --progress-bar
         sudo chmod 0755 /bin/aliyunpan
