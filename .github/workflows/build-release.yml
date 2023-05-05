@@ -142,7 +142,6 @@ jobs:
 
     - name: Install aliyunpan & login
       id: aliyunpan
-      continue-on-error: true
       run: |
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
           device_id=${{ secrets.device_id_r4s }}
@@ -157,11 +156,10 @@ jobs:
         aliyun_token=`curl -s ${{ secrets.aliyun_token }} | openssl enc -aes-256-cfb -pbkdf2 -a -d -k ${{ secrets.token_dec }}`
         aliyunpan config set -device_id=$device_id >/dev/null 2>&1
         echo
-        echo $aliyun_token | aliyunpan login
+        echo $aliyun_token | aliyunpan login || echo $aliyun_token | aliyunpan login || echo $aliyun_token | aliyunpan login
 
     - name: Upload Firmware - releases
       id: upload-firmware
-      continue-on-error: true
       run: |
         export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
         version=$(cat openwrt/version.txt)
