@@ -146,7 +146,7 @@ jobs:
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
           device_id=${{ secrets.device_id_r4s }}
         elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
-          device_id=${{ secrets.device_id }}
+          device_id=${{ secrets.device_id_r5s }}
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
           device_id=${{ secrets.device_id_x86 }}
         fi
@@ -185,6 +185,7 @@ jobs:
           aliyunpan upload -ow rom/*-ext4-combined-efi.img.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
           aliyunpan upload -ow rom/*-squashfs-combined-efi.img.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
         fi
+        echo y | aliyunpan logout
 
     - name: Release OTA
       if: env.release_ota == 'true'
