@@ -65,19 +65,17 @@ jobs:
 
     - name: Compile Toolchain
       run: |
-        BUILD_TOOLCHAIN=y KERNEL_TESTING=1 bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
+        BUILD_TOOLCHAIN=y bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
         cd openwrt
         tags=$(git describe --abbrev=0 --tags)
         echo "latest_release=$tags" >>$GITHUB_ENV
 
-    - name: Create release
-      id: create_release
-      uses: ncipollo/release-action@v1.11.1
+    - name: Upload FTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
-        name: OpenWRT-${{ env.latest_release }}
-        allowUpdates: true
-        tag: ${{ env.latest_release }}
-        commit: master
-        replacesArtifacts: true
-        token: ${{ secrets.workflow_token }}
-        artifacts: openwrt/toolchain-*.tar.gz
+        server: ${{ secrets.ftp_address }}
+        username: ${{ secrets.ftp_username }}
+        password: ${{ secrets.ftp_password }}
+        server-dir: /
+        local-dir: openwrt/toolchain-cache/
+        dangerous-clean-slate: false
