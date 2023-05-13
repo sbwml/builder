@@ -66,9 +66,9 @@ jobs:
     - name: Compile Toolchain
       run: |
         BUILD_TOOLCHAIN=y bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
-        cd openwrt
-        tags=$(git describe --abbrev=0 --tags)
-        echo "latest_release=$tags" >>$GITHUB_ENV
+        echo 'toolchain_arch<<EOF' >> $GITHUB_ENV
+        cat openwrt/toolchain-cache/arch.txt >> $GITHUB_ENV
+        echo 'EOF' >> $GITHUB_ENV
 
     - name: Upload FTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
@@ -76,6 +76,8 @@ jobs:
         server: ${{ secrets.ftp_address }}
         username: ${{ secrets.ftp_username }}
         password: ${{ secrets.ftp_password }}
-        server-dir: /
+        server-dir: /${{ env.toolchain_arch }}/
         local-dir: openwrt/toolchain-cache/
-        dangerous-clean-slate: false
+        dangerous-clean-slate: true
+        exclude: |
+          arch.txt
