@@ -81,7 +81,7 @@ jobs:
       id: compileopenwrt
       run: |
         [ "${{ matrix.model }}" = "nanopi-r5s" ] && export BUILD_SDK=y
-        bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
+        BUILD_FAST=y bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
         cd openwrt
         tags=$(git describe --abbrev=0 --tags)
         echo "latest_release=$tags" >>$GITHUB_ENV

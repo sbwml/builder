@@ -68,7 +68,7 @@ jobs:
       id: compileopenwrt
       run: |
         [ "${{ matrix.model }}" != "x86_64" ] && export KERNEL_TESTING=1
-        bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
+        BUILD_FAST=y bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
         build_date=$(date "+%Y-%m-%d")
         echo "build_date=$build_date" >> $GITHUB_ENV
 
