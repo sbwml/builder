@@ -1,11 +1,11 @@
-name: Build releases - toolchain
+name: Build toolchain
 
 on: workflow_dispatch
 
 jobs:
   build:
     if: github.event.repository.owner.id == github.event.sender.id
-    name: Toolchain ${{ matrix.model }}-${{ matrix.tag.version }}
+    name: Toolchain ${{ matrix.model }}-${{ matrix.tag.version }}-${{ matrix.libc }}
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
@@ -16,6 +16,11 @@ jobs:
         tag:
           - type: rc
             version: openwrt-22.03
+        libc:
+          - musl
+          - glibc
+        exclude:
+          - { model: x86_64, libc: glibc }
 
     steps:
     - name: Checkout
@@ -66,6 +71,7 @@ jobs:
     - name: Compile Toolchain
       run: |
         [ "${{ matrix.model }}" = "nanopi-r5s" ] && export BUILD_SDK=y
+        [ "${{ matrix.libc }}" = "glibc" ] && export USE_GLIBC=y
         BUILD_TOOLCHAIN=y bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
         echo 'toolchain_arch<<EOF' >> $GITHUB_ENV
         cat openwrt/toolchain-cache/arch.txt >> $GITHUB_ENV
@@ -77,7 +83,7 @@ jobs:
         server: ${{ secrets.ftp_address }}
         username: ${{ secrets.ftp_username }}
         password: ${{ secrets.ftp_password }}
-        server-dir: /${{ env.toolchain_arch }}/
+        server-dir: /${{ env.toolchain_arch }}-${{ matrix.libc }}/
         local-dir: openwrt/toolchain-cache/
         dangerous-clean-slate: true
         exclude: |

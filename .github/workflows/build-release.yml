@@ -80,8 +80,8 @@ jobs:
     - name: Compile Openwrt
       id: compileopenwrt
       run: |
-        [ "${{ matrix.model }}" != "x86_64" ] && export BUILD_SDK=y
-        BUILD_FAST=y bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
+        [ "${{ matrix.model }}" != "x86_64" ] && export BUILD_SDK=y USE_GLIBC=n
+        BUILD_FAST=y BUILD_EXTRA=n bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
         cd openwrt
         tags=$(git describe --abbrev=0 --tags)
         echo "latest_release=$tags" >>$GITHUB_ENV
