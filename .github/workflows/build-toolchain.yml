@@ -16,6 +16,8 @@ jobs:
         tag:
           - type: rc
             version: openwrt-22.03
+          - type: dev
+            version: openwrt-23.05
         libc:
           - musl
           - glibc
@@ -83,7 +85,7 @@ jobs:
         server: ${{ secrets.ftp_address }}
         username: ${{ secrets.ftp_username }}
         password: ${{ secrets.ftp_password }}
-        server-dir: /${{ env.toolchain_arch }}-${{ matrix.libc }}/
+        server-dir: /${{ matrix.tag.version }}/${{ env.toolchain_arch }}-${{ matrix.libc }}/
         local-dir: openwrt/toolchain-cache/
         dangerous-clean-slate: true
         exclude: |
