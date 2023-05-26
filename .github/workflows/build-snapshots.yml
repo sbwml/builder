@@ -17,7 +17,7 @@ jobs:
           - x86_64
         tag:
           - type: dev
-            version: openwrt-22.03
+            version: openwrt-23.05
 
     steps:
     - name: Checkout
@@ -131,7 +131,7 @@ jobs:
       run: |
         export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
         DATE=$(date "+%Y-%m-%d")
-        branch=22.03-SNAPSHOT
+        branch=23.05-SNAPSHOT
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
           aliyunpan upload -ow info/manifest.txt openwrt/nanopi-r4s/snapshots/$branch/$DATE/
           aliyunpan upload -ow info/config.buildinfo openwrt/nanopi-r4s/snapshots/$branch/$DATE/
