@@ -35,12 +35,6 @@ jobs:
 
     - name: Set release env
       run: |
-        if [[ ${{ matrix.model }} == "null" ]]; then
-          echo "release=false" >> "$GITHUB_ENV"
-        fi
-        if [[ ${{ matrix.model }} == "nanopi-r4s" ]] || [[ ${{ matrix.model }} == "nanopi-r5s" ]] && [[ ${{ matrix.tag.type }} == "rc" ]]; then
-          echo "release_ota=true" >> "$GITHUB_ENV"
-        fi
         if [[ ${{ matrix.model }} == "nanopi-r5s" ]] && [[ ${{ matrix.tag.type }} == "rc" ]]; then
           echo "release_kmod=true" >> "$GITHUB_ENV"
         fi
@@ -62,7 +56,7 @@ jobs:
         rm -rf ~/{.cargo,.dotnet,.rustup}
         df -h
 
-    - name: Init build dependencies
+    - name: Build System Setup
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
@@ -77,17 +71,15 @@ jobs:
         curl -L ${{ secrets.anycast }} -o anycast.tar.xz --progress-bar
         openssl enc -aes-256-cfb -pbkdf2 -d -k ${{ secrets.openssl_password }} -in anycast.tar.xz | tar -Jxf - && sudo bash init.sh
 
-    - name: Compile Openwrt
-      id: compileopenwrt
+    - name: Compile OpenWrt
       run: |
         [ "${{ matrix.model }}" != "x86_64" ] && export BUILD_SDK=y USE_GLIBC=n
-        BUILD_FAST=y BUILD_EXTRA=n bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
+        BUILD_FAST=y BUILD_EXTRA=n ENABLE_OTA=y bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
         cd openwrt
         tags=$(git describe --abbrev=0 --tags)
         echo "latest_release=$tags" >>$GITHUB_ENV
 
-    - name: Assemble Artifact
-      id: assemble_artifact
+    - name: Prepare Firmware Files
       run: |
         mkdir -p rom info
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
@@ -111,8 +103,6 @@ jobs:
         fi
 
     - name: Create release
-      if: env.release != 'false'
-      id: create_release
       uses: ncipollo/release-action@v1.11.1
       with:
         name: OpenWRT-${{ env.latest_release }}
@@ -125,7 +115,6 @@ jobs:
 
     - name: Release kmods
       if: env.release_kmod == 'true'
-      id: release_kmod
       uses: ncipollo/release-action@v1.11.1
       with:
         name: OpenWRT-${{ env.latest_release }}
@@ -137,7 +126,6 @@ jobs:
         artifacts: openwrt/kmod-*.tar.gz
 
     - name: Install aliyunpan & login
-      id: aliyunpan
       run: |
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
           device_id=${{ secrets.device_id_r4s }}
@@ -162,7 +150,6 @@ jobs:
         echo $aliyun_token | aliyunpan login
 
     - name: Upload Firmware - releases
-      id: upload-firmware
       run: |
         export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
         version=$(cat openwrt/version.txt)
@@ -192,8 +179,6 @@ jobs:
         echo y | aliyunpan logout
 
     - name: Release OTA
-      if: env.release_ota == 'true'
-      id: release_ota
       uses: ncipollo/release-action@v1.11.1
       with:
         name: OpenWRT-${{ env.latest_release }}
