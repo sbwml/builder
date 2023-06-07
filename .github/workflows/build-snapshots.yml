@@ -41,7 +41,7 @@ jobs:
         sudo docker image prune -a -f
         sudo systemctl stop docker
         sudo snap set system refresh.retain=2
-        sudo apt-get -y purge dotnet* firefox clang* ghc* google* llvm* mono* mongo* mysql* php*
+        sudo apt-get -y purge dotnet* firefox clang* ghc* google* llvm* mono* mongo* mysql* php* g++-11-multilib gcc-11-multilib libncurses-dev libncurses5-dev
         sudo apt-get -y autoremove --purge
         sudo apt-get clean
         sudo rm -rf /etc/mysql /etc/php /usr/lib/jvm /usr/libexec/docker /usr/local /usr/src/* /var/lib/docker /var/lib/gems /var/lib/mysql /var/lib/snapd /etc/skel /opt/{microsoft,az,hostedtoolcache,cni,mssql-tools,pipx} /usr/share/{az*,dotnet,swift,miniconda,gradle*,java,kotlinc,ri,sbt} /root/{.sbt,.local,.npm}
@@ -49,7 +49,7 @@ jobs:
         rm -rf ~/{.cargo,.dotnet,.rustup}
         df -h
 
-    - name: Init build dependencies
+    - name: Build System Setup
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
@@ -64,8 +64,7 @@ jobs:
         curl -L ${{ secrets.anycast }} -o anycast.tar.xz --progress-bar
         openssl enc -aes-256-cfb -pbkdf2 -d -k ${{ secrets.openssl_password }} -in anycast.tar.xz | tar -Jxf - && sudo bash init.sh
 
-    - name: Compile Openwrt
-      id: compileopenwrt
+    - name: Compile OpenWrt
       run: |
         [ "${{ matrix.model }}" != "x86_64" ] && export BUILD_SDK=y USE_GLIBC=n
         BUILD_FAST=y BUILD_EXTRA=n bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
@@ -73,7 +72,6 @@ jobs:
         echo "build_date=$build_date" >> $GITHUB_ENV
 
     - name: Assemble Artifact
-      id: assemble_artifact
       run: |
         mkdir -p rom info
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
@@ -102,7 +100,6 @@ jobs:
         path: rom/*.gz
 
     - name: Install aliyunpan & login
-      id: aliyunpan
       run: |
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
           device_id=${{ secrets.device_id_r4s_dev }}
@@ -127,7 +124,6 @@ jobs:
         echo $aliyun_token | aliyunpan login
 
     - name: Upload Firmware - snapshots
-      id: upload-firmware
       run: |
         export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
         DATE=$(date "+%Y-%m-%d")
