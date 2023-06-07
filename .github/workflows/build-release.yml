@@ -17,8 +17,8 @@ jobs:
           - nanopi-r5s
           - x86_64
         tag:
-          - type: rc
-            version: openwrt-22.03
+          - type: rc2
+            version: openwrt-23.05
 
     steps:
     - name: Checkout
@@ -35,7 +35,7 @@ jobs:
 
     - name: Set release env
       run: |
-        if [[ ${{ matrix.model }} == "nanopi-r5s" ]] && [[ ${{ matrix.tag.type }} == "rc" ]]; then
+        if [[ ${{ matrix.model }} == "nanopi-r5s" ]]; then
           echo "release_kmod=true" >> "$GITHUB_ENV"
         fi
 
@@ -181,7 +181,7 @@ jobs:
     - name: Release OTA
       uses: ncipollo/release-action@v1.11.1
       with:
-        name: OpenWRT-${{ env.latest_release }}
+        name: OpenWrt-${{ env.latest_release }}
         allowUpdates: true
         tag: ${{ env.latest_release }}
         commit: master
