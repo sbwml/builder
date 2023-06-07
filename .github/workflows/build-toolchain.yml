@@ -14,9 +14,7 @@ jobs:
           - nanopi-r5s
           - x86_64
         tag:
-          - type: rc
-            version: openwrt-22.03
-          - type: dev
+          - type: rc2
             version: openwrt-23.05
         libc:
           - musl
