@@ -34,7 +34,6 @@ jobs:
 
     - name: Free disk space
       run: |
-        sudo sed -i 's/azure.archive.ubuntu.com/mirror.enzu.com/g' /etc/apt/sources.list
         sudo rm -rf /etc/apt/sources.list.d
         sudo swapoff -a
         sudo rm -f /swapfile
