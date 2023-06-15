@@ -47,7 +47,7 @@ jobs:
         sudo docker image prune -a -f
         sudo systemctl stop docker
         sudo snap set system refresh.retain=2
-        sudo apt-get -y purge dotnet* firefox clang* ghc* google* llvm* mono* mongo* mysql* php* g++-11-multilib gcc-11-multilib libncurses-dev libncurses5-dev
+        sudo apt-get -y purge firefox clang* ghc* google* llvm* mono* mongo* mysql* php*
         sudo apt-get -y autoremove --purge
         sudo apt-get clean
         sudo rm -rf /etc/mysql /etc/php /usr/lib/jvm /usr/libexec/docker /usr/local /usr/src/* /var/lib/docker /var/lib/gems /var/lib/mysql /var/lib/snapd /etc/skel /opt/{microsoft,az,hostedtoolcache,cni,mssql-tools,pipx} /usr/share/{az*,dotnet,swift,miniconda,gradle*,java,kotlinc,ri,sbt} /root/{.sbt,.local,.npm}
