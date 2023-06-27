@@ -91,12 +91,15 @@ jobs:
           cp -a openwrt/bin/targets/rockchip/*/*.img.gz rom/
           cp -a openwrt/bin/targets/rockchip/*/*-r4s.manifest info/manifest.txt
           cp -a openwrt/bin/targets/rockchip/*/config.buildinfo info/config.buildinfo
+          cp -a openwrt/bin/targets/rockchip/*/openwrt-sdk-*.tar.xz rom/
+          rename 's/^openwrt-sdk-/nanopi-r4s-openwrt-sdk-/' rom/openwrt-sdk-*
           cd rom && sha256sum * > ../info/sha256sums.txt
         elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
           cp -a openwrt/bin/targets/rockchip/*/*.img.gz rom/
           cp -a openwrt/bin/targets/rockchip/*/*.manifest info/manifest.txt
           cp -a openwrt/bin/targets/rockchip/*/config.buildinfo info/config.buildinfo
           cp -a openwrt/bin/targets/rockchip/*/openwrt-sdk-*.tar.xz rom/
+          rename 's/^openwrt-sdk-/nanopi-r5s-openwrt-sdk-/' rom/openwrt-sdk-*
           cd rom && sha256sum * > ../info/sha256sums.txt
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
           cp -a openwrt/bin/targets/x86/*/*-ext4-combined-efi.img.gz rom/
@@ -162,13 +165,14 @@ jobs:
           aliyunpan upload -ow info/manifest.txt openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
           aliyunpan upload -ow info/config.buildinfo openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
           aliyunpan upload -ow info/sha256sums.txt openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload -ow rom/nanopi-*.tar.xz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
           aliyunpan upload -ow rom/*-r4s-ext4-sysupgrade.img.gz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
           aliyunpan upload -ow rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
         elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
           aliyunpan upload -ow info/manifest.txt openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
           aliyunpan upload -ow info/config.buildinfo openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
           aliyunpan upload -ow info/sha256sums.txt openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload -ow rom/openwrt-sdk-*.tar.xz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload -ow rom/nanopi-*.tar.xz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
           aliyunpan upload -ow rom/*-r5c-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
           aliyunpan upload -ow rom/*-r5c-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
           aliyunpan upload -ow rom/*-r5s-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/

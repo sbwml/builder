@@ -15,6 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         model:
+          - nanopi-r4s
           - nanopi-r5s
           - x86_64
         tag:
@@ -75,7 +76,7 @@ jobs:
 
     - name: Compile Toolchain
       run: |
-        [ "${{ matrix.model }}" = "nanopi-r5s" ] && export BUILD_SDK=y
+        [ "${{ matrix.model }}" != "x86_64" ] && export BUILD_SDK=y
         [ "${{ matrix.libc }}" = "glibc" ] && export USE_GLIBC=y
         BUILD_TOOLCHAIN=y bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
         echo 'toolchain_arch<<EOF' >> $GITHUB_ENV
@@ -88,7 +89,7 @@ jobs:
         server: ${{ secrets.ftp_address }}
         username: ${{ secrets.ftp_username }}
         password: ${{ secrets.ftp_password }}
-        server-dir: /${{ matrix.tag.version }}/${{ env.toolchain_arch }}-${{ matrix.libc }}/
+        server-dir: /${{ matrix.tag.version }}/${{ matrix.model }}/${{ matrix.libc }}/
         local-dir: ${{ env.WORKDIR }}/openwrt/toolchain-cache/
         dangerous-clean-slate: true
         exclude: |
