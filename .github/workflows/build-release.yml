@@ -192,12 +192,10 @@ jobs:
         echo y | aliyunpan logout
 
     - name: Release OTA
-      uses: ncipollo/release-action@v1.11.1
+      uses: sbwml/FTP-Deploy-Action@master
       with:
-        name: OpenWrt-${{ env.latest_release }}
-        allowUpdates: true
-        tag: ${{ env.latest_release }}
-        commit: master
-        replacesArtifacts: true
-        token: ${{ secrets.workflow_token }}
-        artifacts: ${{ env.WORKDIR }}/openwrt/fw.json
+        server: ${{ secrets.ftp_address }}
+        username: ${{ secrets.ftp_username }}
+        password: ${{ secrets.ftp_password }}
+        local-dir: ${{ env.WORKDIR }}/openwrt/ota/
+        dangerous-clean-slate: true
