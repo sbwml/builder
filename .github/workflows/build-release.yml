@@ -137,6 +137,15 @@ jobs:
         token: ${{ secrets.workflow_token }}
         artifacts: ${{ env.WORKDIR }}/openwrt/kmod-*.tar.gz
 
+    - name: Release OTA
+      uses: sbwml/FTP-Deploy-Action@master
+      with:
+        server: ${{ secrets.ftp_address }}
+        username: ${{ secrets.ftp_username }}
+        password: ${{ secrets.ftp_password }}
+        local-dir: ${{ env.WORKDIR }}/openwrt/ota/
+        dangerous-clean-slate: true
+
     - name: Install aliyunpan & login
       run: |
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
@@ -190,12 +199,3 @@ jobs:
           aliyunpan upload -ow rom/*-squashfs-combined-efi.img.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
         fi
         echo y | aliyunpan logout
-
-    - name: Release OTA
-      uses: sbwml/FTP-Deploy-Action@master
-      with:
-        server: ${{ secrets.ftp_address }}
-        username: ${{ secrets.ftp_username }}
-        password: ${{ secrets.ftp_password }}
-        local-dir: ${{ env.WORKDIR }}/openwrt/ota/
-        dangerous-clean-slate: true
