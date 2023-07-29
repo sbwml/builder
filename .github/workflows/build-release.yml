@@ -41,7 +41,7 @@ jobs:
     - name: Set release env
       run: |
         echo WORKDIR="/home/runner" >> "$GITHUB_ENV"
-        if [[ ${{ matrix.model }} == "nanopi-r5s" ]]; then
+        if [[ ${{ matrix.model }} != "nanopi-r4s" ]]; then
           echo "release_kmod=true" >> "$GITHUB_ENV"
         fi
 
