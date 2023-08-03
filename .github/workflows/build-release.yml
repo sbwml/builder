@@ -174,6 +174,8 @@ jobs:
         artifacts: ${{ env.WORKDIR }}/virtual_images/*-generic-squashfs-combined-efi*
 
     - name: Install aliyunpan & login
+      id: login
+      continue-on-error: true
       run: |
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
           device_id=${{ secrets.device_id_r4s }}
@@ -197,7 +199,16 @@ jobs:
         echo
         echo $aliyun_token | aliyunpan login
 
+    - name: Retry login aliyunpan
+      if: steps.login.outcome == 'failure'
+      run: |
+        export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
+        aliyun_token=`curl -s ${{ secrets.aliyun_token }} | openssl enc -aes-256-cfb -pbkdf2 -a -d -k ${{ secrets.token_dec }}`
+        echo $aliyun_token | proxychains -q aliyunpan login
+
     - name: Upload Firmware - releases
+      id: upload
+      continue-on-error: true
       run: |
         export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
         version=$(cat openwrt/version.txt)
@@ -232,3 +243,40 @@ jobs:
           aliyunpan upload -ow virtual_images/*.qcow2 openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/virtual_machine_images/
         fi
         echo y | aliyunpan logout
+
+    - name: Retry Upload Firmware - releases
+      if: steps.upload.outcome == 'failure'
+      run: |
+        export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
+        version=$(cat openwrt/version.txt)
+        if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
+          proxychains -q aliyunpan upload -ow info/manifest.txt openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
+          proxychains -q aliyunpan upload -ow info/config.buildinfo openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
+          proxychains -q aliyunpan upload -ow info/sha256sums.txt openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
+          proxychains -q aliyunpan upload -ow rom/nanopi-*.tar.xz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
+          proxychains -q aliyunpan upload -ow rom/*-r4s-ext4-sysupgrade.img.gz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
+          proxychains -q aliyunpan upload -ow rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
+        elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
+          proxychains -q aliyunpan upload -ow info/manifest.txt openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          proxychains -q aliyunpan upload -ow info/config.buildinfo openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          proxychains -q aliyunpan upload -ow info/sha256sums.txt openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          proxychains -q aliyunpan upload -ow rom/nanopi-*.tar.xz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          proxychains -q aliyunpan upload -ow rom/*-r5c-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          proxychains -q aliyunpan upload -ow rom/*-r5c-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          proxychains -q aliyunpan upload -ow rom/*-r5s-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          proxychains -q aliyunpan upload -ow rom/*-r5s-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+        elif [ "${{ matrix.model }}" = "x86_64" ]; then
+          proxychains -q aliyunpan upload -ow info/manifest.txt openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
+          proxychains -q aliyunpan upload -ow info/config.buildinfo openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
+          proxychains -q aliyunpan upload -ow info/sha256sums.txt openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
+          proxychains -q aliyunpan upload -ow rom/*-generic-rootfs.tar.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
+          proxychains -q aliyunpan upload -ow rom/*-ext4-combined-efi.img.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
+          proxychains -q aliyunpan upload -ow rom/*-squashfs-combined-efi.img.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
+          # virtual machine images
+          proxychains -q aliyunpan upload -ow virtual_images/README.md openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/virtual_machine_images/
+          proxychains -q aliyunpan upload -ow virtual_images/sha256sums.txt openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/virtual_machine_images/
+          proxychains -q aliyunpan upload -ow virtual_images/*.vmdk openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/virtual_machine_images/
+          proxychains -q aliyunpan upload -ow virtual_images/*.vhd openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/virtual_machine_images/
+          proxychains -q aliyunpan upload -ow virtual_images/*.qcow2 openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/virtual_machine_images/
+        fi
+        echo y | proxychains -q aliyunpan logout
