@@ -47,7 +47,7 @@ jobs:
     - name: Free disk space
       run: |
         sudo rm -rf /etc/apt/sources.list.d
-        sudo sed -i 's/azure.archive.ubuntu.com/archive.ubuntu.com/g' /etc/apt/sources.list
+        sudo bash -c "curl -s https://us.cooluc.com/ubuntu-apt/sources-20.04.list > /etc/apt/sources.list"
         sudo swapoff -a
         sudo rm -f /swapfile
         sudo docker image prune -a -f
