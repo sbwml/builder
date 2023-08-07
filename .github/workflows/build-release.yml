@@ -82,8 +82,8 @@ jobs:
 
     - name: Compile OpenWrt
       run: |
-        [ "${{ matrix.model }}" != "x86_64" ] && export BUILD_SDK=y USE_GLIBC=n
-        BUILD_FAST=y BUILD_EXTRA=n ENABLE_OTA=y ENABLE_BPF=y bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
+        [ "${{ matrix.model }}" = "nanopi-r5s" ] && export BUILD_SDK=y
+        BUILD_FAST=y ENABLE_OTA=y ENABLE_BPF=y bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
         cd openwrt
         tags=$(git describe --abbrev=0 --tags)
         echo "latest_release=$tags" >>$GITHUB_ENV
@@ -95,8 +95,6 @@ jobs:
           cp -a openwrt/bin/targets/rockchip/*/*.img.gz rom/
           cp -a openwrt/bin/targets/rockchip/*/*-r4s.manifest info/manifest.txt
           cp -a openwrt/bin/targets/rockchip/*/config.buildinfo info/config.buildinfo
-          cp -a openwrt/bin/targets/rockchip/*/openwrt-sdk-*.tar.xz rom/
-          rename 's/openwrt-sdk-/nanopi-r4s-openwrt-sdk-/' rom/openwrt-sdk-*
           cd rom && sha256sum * > ../info/sha256sums.txt
         elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
           cp -a openwrt/bin/targets/rockchip/*/*.img.gz rom/
@@ -216,7 +214,6 @@ jobs:
           aliyunpan upload -ow info/manifest.txt openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
           aliyunpan upload -ow info/config.buildinfo openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
           aliyunpan upload -ow info/sha256sums.txt openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload -ow rom/nanopi-*.tar.xz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
           aliyunpan upload -ow rom/*-r4s-ext4-sysupgrade.img.gz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
           aliyunpan upload -ow rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
         elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
@@ -253,7 +250,6 @@ jobs:
           proxychains -q aliyunpan upload -ow info/manifest.txt openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
           proxychains -q aliyunpan upload -ow info/config.buildinfo openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
           proxychains -q aliyunpan upload -ow info/sha256sums.txt openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
-          proxychains -q aliyunpan upload -ow rom/nanopi-*.tar.xz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
           proxychains -q aliyunpan upload -ow rom/*-r4s-ext4-sysupgrade.img.gz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
           proxychains -q aliyunpan upload -ow rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
         elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
