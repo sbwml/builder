@@ -66,11 +66,11 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-        sudo sh -c 'echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-15 main" >> /etc/apt/sources.list'
-        sudo sh -c 'echo "deb-src http://apt.llvm.org/focal/ llvm-toolchain-focal-15 main" >> /etc/apt/sources.list'
+        sudo sh -c 'echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-17 main" >> /etc/apt/sources.list'
+        sudo sh -c 'echo "deb-src http://apt.llvm.org/focal/ llvm-toolchain-focal-17 main" >> /etc/apt/sources.list'
         wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
         sudo apt-get update
-        sudo apt-get install -y build-essential flex bison clang-15 cmake g++ gawk gcc-multilib g++-multilib gettext git libfuse-dev libncurses5-dev libssl-dev python3 python3-pip python3-ply python3-distutils python3-pyelftools rsync unzip zlib1g-dev file wget subversion patch upx-ucl autoconf automake curl asciidoc binutils bzip2 lib32gcc-s1 libc6-dev-i386 uglifyjs msmtp texinfo libreadline-dev libglib2.0-dev xmlto libelf-dev libtool autopoint antlr3 gperf ccache swig coreutils haveged scons libpython3-dev rename qemu-utils
+        sudo apt-get install -y build-essential flex bison clang-17 cmake g++ gawk gcc-multilib g++-multilib gettext git libfuse-dev libncurses5-dev libssl-dev python3 python3-pip python3-ply python3-distutils python3-pyelftools rsync unzip zlib1g-dev file wget subversion patch upx-ucl autoconf automake curl asciidoc binutils bzip2 lib32gcc-s1 libc6-dev-i386 uglifyjs msmtp texinfo libreadline-dev libglib2.0-dev xmlto libelf-dev libtool autopoint antlr3 gperf ccache swig coreutils haveged scons libpython3-dev rename qemu-utils
         sudo apt-get clean
         git config --global user.name 'GitHub Actions' && git config --global user.email 'noreply@github.com'
         df -Th
@@ -125,7 +125,7 @@ jobs:
     - name: Create release
       uses: ncipollo/release-action@v1.11.1
       with:
-        name: OpenWRT-${{ env.latest_release }}
+        name: OpenWrt-${{ env.latest_release }}
         allowUpdates: true
         tag: ${{ env.latest_release }}
         commit: master
@@ -137,7 +137,7 @@ jobs:
       if: env.release_kmod == 'true'
       uses: ncipollo/release-action@v1.11.1
       with:
-        name: OpenWRT-${{ env.latest_release }}
+        name: OpenWrt-${{ env.latest_release }}
         allowUpdates: true
         tag: ${{ env.latest_release }}
         commit: master
@@ -158,7 +158,7 @@ jobs:
       if: ${{ matrix.model == 'x86_64' }}
       uses: ncipollo/release-action@v1.11.1
       with:
-        name: OpenWRT-${{ env.latest_release }}
+        name: OpenWrt-${{ env.latest_release }}
         allowUpdates: true
         tag: ${{ env.latest_release }}
         commit: master
@@ -167,7 +167,6 @@ jobs:
         artifacts: ${{ env.WORKDIR }}/virtual_images/*-generic-squashfs-combined-efi*
 
     - name: Install aliyunpan & login
-      id: login
       continue-on-error: true
       run: |
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
@@ -182,21 +181,7 @@ jobs:
         export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
         aliyun_token=`curl -s ${{ secrets.aliyun_token }} | openssl enc -aes-256-cfb -pbkdf2 -a -d -k ${{ secrets.token_dec }}`
         aliyunpan config set -device_id=$device_id >/dev/null 2>&1
-        check_status() (
-          curl -I -4 -m 5 -o /dev/null -s -w %{http_code} https://auth.aliyundrive.com/v2/account/token
-        )
-        while [[ "$(check_status)" -ne 405 ]]
-        do
-          check_status
-        done
         echo
-        echo $aliyun_token | aliyunpan login
-
-    - name: Retry login aliyunpan
-      if: steps.login.outcome == 'failure'
-      run: |
-        export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
-        aliyun_token=`curl -s ${{ secrets.aliyun_token }} | openssl enc -aes-256-cfb -pbkdf2 -a -d -k ${{ secrets.token_dec }}`
         echo $aliyun_token | aliyunpan login
 
     - name: Upload Firmware - releases
@@ -239,36 +224,5 @@ jobs:
     - name: Retry Upload Firmware - releases
       if: steps.upload.outcome == 'failure'
       run: |
-        export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
-        version=$(cat openwrt/version.txt)
-        aliyunpan token update
-        if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
-          aliyunpan upload -ow info/manifest.txt openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload -ow info/config.buildinfo openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload -ow info/sha256sums.txt openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload -ow rom/*-r4s-ext4-sysupgrade.img.gz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload -ow rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
-        elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
-          aliyunpan upload -ow info/manifest.txt openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload -ow info/config.buildinfo openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload -ow info/sha256sums.txt openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload -ow rom/nanopi-*.tar.xz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload -ow rom/*-r5c-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload -ow rom/*-r5c-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload -ow rom/*-r5s-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload -ow rom/*-r5s-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
-        elif [ "${{ matrix.model }}" = "x86_64" ]; then
-          aliyunpan upload -ow info/manifest.txt openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload -ow info/config.buildinfo openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload -ow info/sha256sums.txt openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload -ow rom/*-generic-rootfs.tar.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload -ow rom/*-ext4-combined-efi.img.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload -ow rom/*-squashfs-combined-efi.img.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
-          # virtual machine images
-          aliyunpan upload -ow virtual_images/README.md openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/virtual_machine_images/
-          aliyunpan upload -ow virtual_images/sha256sums.txt openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/virtual_machine_images/
-          aliyunpan upload -ow virtual_images/*.vmdk openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/virtual_machine_images/
-          aliyunpan upload -ow virtual_images/*.vhd openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/virtual_machine_images/
-          aliyunpan upload -ow virtual_images/*.qcow2 openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/virtual_machine_images/
-        fi
-        echo y | aliyunpan logout
+        sshpass -p ${{ secrets.user_password }} ssh -o StrictHostKeyChecking=no ${{ secrets.user_name }}@${{ secrets.ftp_address }} >/dev/null 2>&1
+        sshpass -p ${{ secrets.user_password }} ssh ${{ secrets.user_name }}@${{ secrets.ftp_address }} "/opt/sbin/fw-upload ${{ matrix.model }}"
