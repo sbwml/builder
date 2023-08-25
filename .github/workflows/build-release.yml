@@ -44,6 +44,11 @@ jobs:
         if [[ ${{ matrix.model }} != "nanopi-r4s" ]]; then
           echo "release_kmod=true" >> "$GITHUB_ENV"
         fi
+        if [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
+          echo "kmod_repo=kmod-aarch64" >> "$GITHUB_ENV"
+        elif [ "${{ matrix.model }}" = "x86_64" ]; then
+          echo "kmod_repo=kmod-x86_64" >> "$GITHUB_ENV"
+        fi
 
     - name: Free disk space
       run: |
@@ -145,6 +150,14 @@ jobs:
         replacesArtifacts: true
         token: ${{ secrets.workflow_token }}
         artifacts: ${{ env.WORKDIR }}/openwrt/*-*.tar.gz
+
+    - name: Sync kernel modules
+      if: env.release_kmod == 'true'
+      uses: peter-evans/repository-dispatch@v2
+      with:
+        token: ${{ secrets.workflow_token }}
+        repository: sbwml/${{ env.kmod_repo }}
+        event-type: sync
 
     - name: Release OTA
       uses: sbwml/FTP-Deploy-Action@master
