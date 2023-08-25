@@ -77,6 +77,7 @@ jobs:
     - name: Compile OpenWrt
       run: |
         [ "${{ matrix.model }}" = "nanopi-r5s" ] && export BUILD_SDK=y
+        [ "${{ matrix.model }}" = "x86_64" ] && export KERNEL_TESTING=y
         BUILD_FAST=y ENABLE_BPF=y bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
         build_date=$(date "+%Y-%m-%d")
         echo "build_date=$build_date" >> $GITHUB_ENV
