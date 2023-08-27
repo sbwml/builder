@@ -7,7 +7,7 @@ on:
 jobs:
   build:
     name: Build ${{ matrix.model }}-${{ matrix.tag.version }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     defaults:
       run:
         shell: bash
@@ -47,7 +47,7 @@ jobs:
     - name: Free disk space
       run: |
         sudo rm -rf /etc/apt/sources.list.d
-        sudo bash -c "curl -s https://us.cooluc.com/ubuntu-apt/sources-20.04.list > /etc/apt/sources.list"
+        sudo bash -c "curl -s https://us.cooluc.com/ubuntu-apt/sources-22.04.list > /etc/apt/sources.list"
         sudo swapoff -a
         sudo rm -f /swapfile
         sudo docker image prune -a -f
@@ -76,8 +76,6 @@ jobs:
 
     - name: Compile OpenWrt
       run: |
-        [ "${{ matrix.model }}" = "nanopi-r5s" ] && export BUILD_SDK=y
-        [ "${{ matrix.model }}" = "x86_64" ] && export KERNEL_TESTING=y
         BUILD_FAST=y ENABLE_BPF=y bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
         build_date=$(date "+%Y-%m-%d")
         echo "build_date=$build_date" >> $GITHUB_ENV

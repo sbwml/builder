@@ -8,7 +8,7 @@ jobs:
   build:
     if: github.event.repository.owner.id == github.event.sender.id
     name: Build ${{ matrix.model }}-${{ matrix.tag.version }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     defaults:
       run:
         shell: bash
@@ -53,7 +53,7 @@ jobs:
     - name: Free disk space
       run: |
         sudo rm -rf /etc/apt/sources.list.d
-        sudo bash -c "curl -s https://us.cooluc.com/ubuntu-apt/sources-20.04.list > /etc/apt/sources.list"
+        sudo bash -c "curl -s https://us.cooluc.com/ubuntu-apt/sources-22.04.list > /etc/apt/sources.list"
         sudo swapoff -a
         sudo rm -f /swapfile
         sudo docker image prune -a -f
@@ -82,8 +82,6 @@ jobs:
 
     - name: Compile OpenWrt
       run: |
-        [ "${{ matrix.model }}" = "nanopi-r5s" ] && export BUILD_SDK=y
-        [ "${{ matrix.model }}" = "x86_64" ] && export KERNEL_TESTING=y
         BUILD_FAST=y ENABLE_OTA=y ENABLE_BPF=y bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
         cd openwrt
         tags=$(git describe --abbrev=0 --tags)
@@ -101,8 +99,6 @@ jobs:
           cp -a openwrt/bin/targets/rockchip/*/*.img.gz rom/
           cp -a openwrt/bin/targets/rockchip/*/*.manifest info/manifest.txt
           cp -a openwrt/bin/targets/rockchip/*/config.buildinfo info/config.buildinfo
-          cp -a openwrt/bin/targets/rockchip/*/openwrt-sdk-*.tar.xz rom/
-          rename 's/openwrt-sdk-/nanopi-r5s-openwrt-sdk-/' rom/openwrt-sdk-*
           cd rom && sha256sum * > ../info/sha256sums.txt
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
           cp -a openwrt/bin/targets/x86/*/*-ext4-combined-efi.img.gz rom/
@@ -168,18 +164,6 @@ jobs:
         local-dir: ${{ env.WORKDIR }}/openwrt/ota/
         dangerous-clean-slate: true
 
-    - name: Release virtual machine images
-      if: ${{ matrix.model == 'x86_64' }}
-      uses: ncipollo/release-action@v1.11.1
-      with:
-        name: OpenWrt-${{ env.latest_release }}
-        allowUpdates: true
-        tag: ${{ env.latest_release }}
-        commit: master
-        replacesArtifacts: true
-        token: ${{ secrets.workflow_token }}
-        artifacts: ${{ env.WORKDIR }}/virtual_images/*-generic-squashfs-combined-efi*
-
     - name: Install aliyunpan & login
       continue-on-error: true
       run: |
@@ -214,7 +198,6 @@ jobs:
           aliyunpan upload -ow info/manifest.txt openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
           aliyunpan upload -ow info/config.buildinfo openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
           aliyunpan upload -ow info/sha256sums.txt openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload -ow rom/nanopi-*.tar.xz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
           aliyunpan upload -ow rom/*-r5c-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
           aliyunpan upload -ow rom/*-r5c-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
           aliyunpan upload -ow rom/*-r5s-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
