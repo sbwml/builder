@@ -75,10 +75,18 @@ jobs:
         df -Th
 
     - name: Compile OpenWrt
+      id: compile
+      continue-on-error: true
       run: |
         BUILD_FAST=y ENABLE_BPF=y bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
         build_date=$(date "+%Y-%m-%d")
         echo "build_date=$build_date" >> $GITHUB_ENV
+
+    - name: Extensive logs after a failed compilation
+      if: steps.compile.outcome == 'failure'
+      run: |
+        cd openwrt
+        make V=s
 
     - name: Assemble Artifact
       run: |
