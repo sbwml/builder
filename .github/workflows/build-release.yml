@@ -116,6 +116,8 @@ jobs:
           cp -a openwrt/bin/targets/x86/*/config.buildinfo info/config.buildinfo
           cd rom && sha256sum * > ../info/sha256sums.txt
         fi
+        cd ..
+        tar zcf rom/buildinfo_${{ matrix.model }}.tar.gz info
 
     - name: Create virtual machine images
       if: ${{ matrix.model == 'x86_64' }}
