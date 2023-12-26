@@ -11,7 +11,6 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: /home/runner
     strategy:
       fail-fast: false
       matrix:
@@ -39,7 +38,7 @@ jobs:
 
     - name: Set release env
       run: |
-        echo WORKDIR="/home/runner" >> "$GITHUB_ENV"
+        echo WORKDIR="/builder" >> "$GITHUB_ENV"
         if [[ ${{ matrix.model }} == "null" ]]; then
           echo "release=false" >> "$GITHUB_ENV"
         fi
@@ -49,7 +48,7 @@ jobs:
         sudo rm -rf /etc/apt/sources.list.d
         sudo bash -c "curl -s https://us.cooluc.com/ubuntu-apt/sources-22.04.list > /etc/apt/sources.list"
         sudo swapoff -a
-        sudo rm -f /swapfile
+        sudo rm -f /swapfile /mnt/swapfile
         sudo docker image prune -a -f
         sudo systemctl stop docker
         sudo snap set system refresh.retain=2
@@ -59,6 +58,27 @@ jobs:
         sudo rm -rf /etc/mysql /etc/php /usr/lib/jvm /usr/libexec/docker /usr/local /usr/src/* /var/lib/docker /var/lib/gems /var/lib/mysql /var/lib/snapd /etc/skel /opt/{microsoft,az,hostedtoolcache,cni,mssql-tools,pipx} /usr/share/{az*,dotnet,swift,miniconda,gradle*,java,kotlinc,ri,sbt} /root/{.sbt,.local,.npm}
         sudo sed -i '/NVM_DIR/d;/skel/d' /root/{.bashrc,.profile}
         rm -rf ~/{.cargo,.dotnet,.rustup}
+        df -Th
+
+    - name: Create VG & LV
+      run: |
+        mnt_size=$(expr $(df -h /mnt | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 1)
+        root_size=$(expr $(df -h / | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 4)
+        sudo truncate -s "$mnt_size"G /mnt/mnt.img
+        sudo truncate -s "$root_size"G /root.img
+        sudo losetup /dev/loop6 /mnt/mnt.img
+        sudo losetup /dev/loop7 /root.img
+        sudo pvcreate /dev/loop6
+        sudo pvcreate /dev/loop7
+        sudo vgcreate github /dev/loop6 /dev/loop7
+        sudo lvcreate -n runner -l 100%FREE github
+        sudo mkfs.xfs /dev/github/runner
+
+    - name: Mount LV
+      run: |
+        sudo mkdir -p /builder
+        sudo mount /dev/github/runner /builder
+        sudo chown -R runner.runner /builder
         df -Th
 
     - name: Build System Setup
@@ -77,6 +97,7 @@ jobs:
     - name: Compile OpenWrt
       id: compile
       continue-on-error: true
+      working-directory: /builder
       run: |
         BUILD_FAST=y ENABLE_BPF=y bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
         build_date=$(date "+%Y-%m-%d")
@@ -84,11 +105,13 @@ jobs:
 
     - name: Extensive logs after a failed compilation
       if: steps.compile.outcome == 'failure'
+      working-directory: /builder
       run: |
         cd openwrt
         make V=s
 
     - name: Assemble Artifact
+      working-directory: /builder
       run: |
         mkdir -p rom info
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
@@ -117,6 +140,7 @@ jobs:
         path: ${{ env.WORKDIR }}/rom/*.gz
 
     - name: Install aliyunpan & login
+      working-directory: /builder
       run: |
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
           device_id=${{ secrets.device_id_r4s_dev }}
@@ -135,6 +159,7 @@ jobs:
         echo $aliyun_token | aliyunpan login
 
     - name: Upload Firmware - snapshots
+      working-directory: /builder
       run: |
         export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
         DATE=$(date "+%Y-%m-%d")
