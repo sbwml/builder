@@ -190,7 +190,7 @@ jobs:
       uses: sbwml/FTP-Deploy-Action@master
       with:
         server: ${{ secrets.ftp_address }}
-        username: ${{ secrets.ftp_minimal }}
+        username: ${{ matrix.model }}-minimal
         password: ${{ secrets.ftp_password }}
         local-dir: ${{ env.WORKDIR }}/openwrt/ota/
         dangerous-clean-slate: true

@@ -189,15 +189,6 @@ jobs:
         repository: sbwml/${{ env.kmod_repo }}
         event-type: sync
 
-    - name: Release OTA
-      uses: sbwml/FTP-Deploy-Action@master
-      with:
-        server: ${{ secrets.ftp_address }}
-        username: ${{ secrets.ftp_username }}
-        password: ${{ secrets.ftp_password }}
-        local-dir: ${{ env.WORKDIR }}/openwrt/ota/
-        dangerous-clean-slate: true
-
     - name: Install aliyunpan & login
       continue-on-error: true
       working-directory: /builder
@@ -260,3 +251,12 @@ jobs:
       run: |
         sshpass -p ${{ secrets.user_password }} ssh -o StrictHostKeyChecking=no ${{ secrets.user_name }}@${{ secrets.ftp_address }} >/dev/null 2>&1
         sshpass -p ${{ secrets.user_password }} ssh ${{ secrets.user_name }}@${{ secrets.ftp_address }} "/opt/sbin/fw-upload ${{ matrix.model }}"
+
+    - name: Release OTA
+      uses: sbwml/FTP-Deploy-Action@master
+      with:
+        server: ${{ secrets.ftp_address }}
+        username: ${{ matrix.model }}
+        password: ${{ secrets.ftp_password }}
+        local-dir: ${{ env.WORKDIR }}/openwrt/ota/
+        dangerous-clean-slate: true
