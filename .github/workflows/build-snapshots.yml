@@ -99,7 +99,7 @@ jobs:
       continue-on-error: true
       working-directory: /builder
       run: |
-        BUILD_FAST=y ENABLE_BPF=y ENABLE_LTO=y bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
+        BUILD_FAST=y ENABLE_BPF=y ENABLE_LTO=y USE_GCC13=y bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
         build_date=$(date "+%Y-%m-%d")
         echo "build_date=$build_date" >> $GITHUB_ENV
 
