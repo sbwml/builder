@@ -159,7 +159,7 @@ jobs:
         echo "<center><h1>x86_64 虚拟机平台镜像</h1></center>" > README.md
 
     - name: Create release
-      uses: ncipollo/release-action@v1.11.1
+      uses: sbwml/release-action@main
       with:
         name: OpenWrt-${{ env.latest_release }}
         allowUpdates: true
@@ -171,7 +171,7 @@ jobs:
 
     - name: Release kmods
       if: env.release_kmod == 'true'
-      uses: ncipollo/release-action@v1.11.1
+      uses: sbwml/release-action@main
       with:
         name: OpenWrt-${{ env.latest_release }}
         allowUpdates: true
@@ -183,7 +183,7 @@ jobs:
 
     - name: Sync kernel modules
       if: env.release_kmod == 'true'
-      uses: peter-evans/repository-dispatch@v2
+      uses: peter-evans/repository-dispatch@v3
       with:
         token: ${{ secrets.workflow_token }}
         repository: sbwml/${{ env.kmod_repo }}

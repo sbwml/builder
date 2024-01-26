@@ -152,7 +152,7 @@ jobs:
         echo $aliyun_token | aliyunpan login
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.model }}-${{ matrix.tag.version }}
         path: ${{ env.WORKDIR }}/rom/*.gz
