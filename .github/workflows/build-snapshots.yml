@@ -151,7 +151,7 @@ jobs:
         fi
         sudo curl -L ${{ secrets.aliyunpan_go }} -o /bin/aliyunpan --progress-bar
         sudo chmod 0755 /bin/aliyunpan
-        sudo sh -c 'echo "${{ secrets.aliyunpan_us_node }} api.aliyundrive.com auth.aliyundrive.com www.aliyundrive.com" >> /etc/hosts'
+        sudo sh -c 'echo "${{ secrets.aliyunpan_us_node }} api.alipan.com auth.alipan.com www.alipan.com" >> /etc/hosts'
         export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
         aliyun_token=`curl -s ${{ secrets.aliyun_token }} | openssl enc -aes-256-cfb -pbkdf2 -a -d -k ${{ secrets.token_dec }}`
         aliyunpan config set -device_id=$device_id >/dev/null 2>&1
