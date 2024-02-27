@@ -184,6 +184,7 @@ jobs:
           aliyunpan upload -ow rom/*-ext4-combined-efi.img.gz openwrt/x86_64/minimal/${{ matrix.tag.version }}/$version/
           aliyunpan upload -ow rom/*-squashfs-combined-efi.img.gz openwrt/x86_64/minimal/${{ matrix.tag.version }}/$version/
         fi
+        aliyunpan recycle delete -all
         echo y | aliyunpan logout
 
     - name: Release OTA

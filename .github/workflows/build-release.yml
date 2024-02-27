@@ -244,6 +244,7 @@ jobs:
           aliyunpan upload -ow virtual_images/*.vhd openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/virtual_machine_images/
           aliyunpan upload -ow virtual_images/*.qcow2 openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/virtual_machine_images/
         fi
+        aliyunpan recycle delete -all
         echo y | aliyunpan logout
 
     - name: Retry Upload Firmware - releases

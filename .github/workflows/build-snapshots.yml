@@ -186,4 +186,5 @@ jobs:
           aliyunpan upload -ow rom/*-ext4-combined-efi.img.gz openwrt/x86_64/snapshots/$branch/$DATE/
           aliyunpan upload -ow rom/*-squashfs-combined-efi.img.gz openwrt/x86_64/snapshots/$branch/$DATE/
         fi
+        aliyunpan recycle delete -all
         echo y | aliyunpan logout
