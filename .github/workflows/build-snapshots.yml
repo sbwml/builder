@@ -165,26 +165,26 @@ jobs:
         DATE=$(date "+%Y-%m-%d")
         branch=23.05-SNAPSHOT
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
-          aliyunpan upload -ow info/manifest.txt openwrt/nanopi-r4s/snapshots/$branch/$DATE/
-          aliyunpan upload -ow info/config.buildinfo openwrt/nanopi-r4s/snapshots/$branch/$DATE/
-          aliyunpan upload -ow info/sha256sums.txt openwrt/nanopi-r4s/snapshots/$branch/$DATE/
-          aliyunpan upload -ow rom/*-r4s-ext4-sysupgrade.img.gz openwrt/nanopi-r4s/snapshots/$branch/$DATE/
-          aliyunpan upload -ow rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/nanopi-r4s/snapshots/$branch/$DATE/
+          aliyunpan upload --timeout 30 --retry 10 --ow --norapid info/manifest.txt openwrt/nanopi-r4s/snapshots/$branch/$DATE/
+          aliyunpan upload --timeout 30 --retry 10 --ow --norapid info/config.buildinfo openwrt/nanopi-r4s/snapshots/$branch/$DATE/
+          aliyunpan upload --timeout 30 --retry 10 --ow --norapid info/sha256sums.txt openwrt/nanopi-r4s/snapshots/$branch/$DATE/
+          aliyunpan upload --timeout 30 --retry 10 --ow --norapid rom/*-r4s-ext4-sysupgrade.img.gz openwrt/nanopi-r4s/snapshots/$branch/$DATE/
+          aliyunpan upload --timeout 30 --retry 10 --ow --norapid rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/nanopi-r4s/snapshots/$branch/$DATE/
         elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
-          aliyunpan upload -ow info/manifest.txt openwrt/nanopi-r5s/snapshots/$branch/$DATE/
-          aliyunpan upload -ow info/config.buildinfo openwrt/nanopi-r5s/snapshots/$branch/$DATE/
-          aliyunpan upload -ow info/sha256sums.txt openwrt/nanopi-r5s/snapshots/$branch/$DATE/
-          aliyunpan upload -ow rom/*-r5c-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/snapshots/$branch/$DATE/
-          aliyunpan upload -ow rom/*-r5c-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/snapshots/$branch/$DATE/
-          aliyunpan upload -ow rom/*-r5s-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/snapshots/$branch/$DATE/
-          aliyunpan upload -ow rom/*-r5s-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/snapshots/$branch/$DATE/
+          aliyunpan upload --timeout 30 --retry 10 --ow --norapid info/manifest.txt openwrt/nanopi-r5s/snapshots/$branch/$DATE/
+          aliyunpan upload --timeout 30 --retry 10 --ow --norapid info/config.buildinfo openwrt/nanopi-r5s/snapshots/$branch/$DATE/
+          aliyunpan upload --timeout 30 --retry 10 --ow --norapid info/sha256sums.txt openwrt/nanopi-r5s/snapshots/$branch/$DATE/
+          aliyunpan upload --timeout 30 --retry 10 --ow --norapid rom/*-r5c-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/snapshots/$branch/$DATE/
+          aliyunpan upload --timeout 30 --retry 10 --ow --norapid rom/*-r5c-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/snapshots/$branch/$DATE/
+          aliyunpan upload --timeout 30 --retry 10 --ow --norapid rom/*-r5s-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/snapshots/$branch/$DATE/
+          aliyunpan upload --timeout 30 --retry 10 --ow --norapid rom/*-r5s-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/snapshots/$branch/$DATE/
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
-          aliyunpan upload -ow info/manifest.txt openwrt/x86_64/snapshots/$branch/$DATE/
-          aliyunpan upload -ow info/config.buildinfo openwrt/x86_64/snapshots/$branch/$DATE/
-          aliyunpan upload -ow info/sha256sums.txt openwrt/x86_64/snapshots/$branch/$DATE/
-          aliyunpan upload -ow rom/*-generic-rootfs.tar.gz openwrt/x86_64/snapshots/$branch/$DATE/
-          aliyunpan upload -ow rom/*-ext4-combined-efi.img.gz openwrt/x86_64/snapshots/$branch/$DATE/
-          aliyunpan upload -ow rom/*-squashfs-combined-efi.img.gz openwrt/x86_64/snapshots/$branch/$DATE/
+          aliyunpan upload --timeout 30 --retry 10 --ow --norapid info/manifest.txt openwrt/x86_64/snapshots/$branch/$DATE/
+          aliyunpan upload --timeout 30 --retry 10 --ow --norapid info/config.buildinfo openwrt/x86_64/snapshots/$branch/$DATE/
+          aliyunpan upload --timeout 30 --retry 10 --ow --norapid info/sha256sums.txt openwrt/x86_64/snapshots/$branch/$DATE/
+          aliyunpan upload --timeout 30 --retry 10 --ow --norapid rom/*-generic-rootfs.tar.gz openwrt/x86_64/snapshots/$branch/$DATE/
+          aliyunpan upload --timeout 30 --retry 10 --ow --norapid rom/*-ext4-combined-efi.img.gz openwrt/x86_64/snapshots/$branch/$DATE/
+          aliyunpan upload --timeout 30 --retry 10 --ow --norapid rom/*-squashfs-combined-efi.img.gz openwrt/x86_64/snapshots/$branch/$DATE/
         fi
         aliyunpan recycle delete -all
         echo y | aliyunpan logout
