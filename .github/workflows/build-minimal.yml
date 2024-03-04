@@ -95,7 +95,7 @@ jobs:
       continue-on-error: true
       working-directory: /builder
       run: |
-        BUILD_FAST=y ENABLE_OTA=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y MINIMAL_BUILD=y USE_GCC13=y USE_MOLD=y bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
+        BUILD_FAST=y ENABLE_OTA=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y MINIMAL_BUILD=y USE_GCC14=y USE_MOLD=y bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
         cd openwrt
         tags=$(git describe --abbrev=0 --tags)
         echo "latest_release=$tags" >>$GITHUB_ENV
