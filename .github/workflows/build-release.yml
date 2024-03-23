@@ -1,8 +1,9 @@
 name: Build releases
 
 on:
-  watch:
-    types: started
+  workflow_dispatch:
+  repository_dispatch:
+    types: [release]
 
 jobs:
   build:
