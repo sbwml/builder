@@ -18,6 +18,7 @@ jobs:
           - nanopi-r4s
           - nanopi-r5s
           - x86_64
+          - netgear_r8500
         tag:
           - type: dev
             version: openwrt-23.05
@@ -131,6 +132,11 @@ jobs:
           cp -a openwrt/bin/targets/x86/*/*-x86-64-generic.manifest info/manifest.txt
           cp -a openwrt/bin/targets/x86/*/config.buildinfo info/config.buildinfo
           cd rom && sha256sum *gz > ../info/sha256sums.txt
+        elif [ "${{ matrix.model }}" = "netgear_r8500" ]; then
+          cp -a openwrt/bin/targets/bcm53xx/generic/*-bcm53xx-generic-netgear_r8500-squashfs.chk rom/
+          cp -a openwrt/bin/targets/bcm53xx/generic/*.manifest info/manifest.txt
+          cp -a openwrt/bin/targets/bcm53xx/generic/config.buildinfo info/config.buildinfo
+          cd rom && sha256sum * > ../info/sha256sums.txt
         fi
 
     - name: Upload artifacts
@@ -148,6 +154,8 @@ jobs:
           device_id=${{ secrets.device_id_r5s_dev }}
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
           device_id=${{ secrets.device_id_x86_dev }}
+        elif [ "${{ matrix.model }}" = "netgear_r8500" ]; then
+          device_id=${{ secrets.device_id_netgear_dev }}
         fi
         sudo curl -L ${{ secrets.aliyunpan_go }} -o /bin/aliyunpan --progress-bar
         sudo chmod 0755 /bin/aliyunpan
@@ -185,6 +193,11 @@ jobs:
           aliyunpan upload --timeout 30 --retry 10 --ow --norapid rom/*-generic-rootfs.tar.gz openwrt/x86_64/snapshots/$branch/$DATE/
           aliyunpan upload --timeout 30 --retry 10 --ow --norapid rom/*-ext4-combined-efi.img.gz openwrt/x86_64/snapshots/$branch/$DATE/
           aliyunpan upload --timeout 30 --retry 10 --ow --norapid rom/*-squashfs-combined-efi.img.gz openwrt/x86_64/snapshots/$branch/$DATE/
+        elif [ "${{ matrix.model }}" = "netgear_r8500" ]; then
+          aliyunpan upload --timeout 30 --retry 10 --ow --norapid info/manifest.txt openwrt/netgear-r8500/snapshots/$branch/$DATE/
+          aliyunpan upload --timeout 30 --retry 10 --ow --norapid info/config.buildinfo openwrt/netgear-r8500/snapshots/$branch/$DATE/
+          aliyunpan upload --timeout 30 --retry 10 --ow --norapid info/sha256sums.txt openwrt/netgear-r8500/snapshots/$branch/$DATE/
+          aliyunpan upload --timeout 30 --retry 10 --ow --norapid rom/*.chk openwrt/netgear-r8500/snapshots/$branch/$DATE/
         fi
         aliyunpan recycle delete -all
         echo y | aliyunpan logout
