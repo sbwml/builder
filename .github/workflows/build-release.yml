@@ -20,6 +20,7 @@ jobs:
           - nanopi-r4s
           - nanopi-r5s
           - x86_64
+          - netgear_r8500
         tag:
           - type: rc2
             version: openwrt-23.05
@@ -48,6 +49,8 @@ jobs:
           echo "kmod_repo=kmod-aarch64" >> "$GITHUB_ENV"
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
           echo "kmod_repo=kmod-x86_64" >> "$GITHUB_ENV"
+        elif [ "${{ matrix.model }}" = "netgear_r8500" ]; then
+          echo "kmod_repo=kmod-bcm53xx" >> "$GITHUB_ENV"
         fi
 
     - name: Free disk space
@@ -139,6 +142,11 @@ jobs:
           cp -a openwrt/bin/targets/x86/*/*-x86-64-generic.manifest info/manifest.txt
           cp -a openwrt/bin/targets/x86/*/config.buildinfo info/config.buildinfo
           cd rom && sha256sum * > ../info/sha256sums.txt
+        elif [ "${{ matrix.model }}" = "netgear_r8500" ]; then
+          cp -a openwrt/bin/targets/bcm53xx/generic/*-bcm53xx-generic-netgear_r8500-squashfs.chk rom/
+          cp -a openwrt/bin/targets/bcm53xx/generic/*.manifest info/manifest.txt
+          cp -a openwrt/bin/targets/bcm53xx/generic/config.buildinfo info/config.buildinfo
+          cd rom && sha256sum * > ../info/sha256sums.txt
         fi
         cd ..
         tar zcf rom/buildinfo_${{ matrix.model }}.tar.gz info
@@ -200,6 +208,8 @@ jobs:
           device_id=${{ secrets.device_id_r5s }}
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
           device_id=${{ secrets.device_id_x86 }}
+        elif [ "${{ matrix.model }}" = "netgear_r8500" ]; then
+          device_id=${{ secrets.device_id_netgear }}
         fi
         sudo curl -L ${{ secrets.aliyunpan_go }} -o /bin/aliyunpan --progress-bar
         sudo chmod 0755 /bin/aliyunpan
@@ -244,6 +254,11 @@ jobs:
           aliyunpan upload --timeout 30 --retry 10 --ow --norapid virtual_images/*.vmdk openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/virtual_machine_images/
           aliyunpan upload --timeout 30 --retry 10 --ow --norapid virtual_images/*.vhd openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/virtual_machine_images/
           aliyunpan upload --timeout 30 --retry 10 --ow --norapid virtual_images/*.qcow2 openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/virtual_machine_images/
+        elif [ "${{ matrix.model }}" = "netgear_r8500" ]; then
+          aliyunpan upload --timeout 30 --retry 10 --ow --norapid info/manifest.txt openwrt/netgear-r8500/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 30 --retry 10 --ow --norapid info/config.buildinfo openwrt/netgear-r8500/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 30 --retry 10 --ow --norapid info/sha256sums.txt openwrt/netgear-r8500/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 30 --retry 10 --ow --norapid rom/*.chk openwrt/netgear-r8500/releases/${{ matrix.tag.version }}/$version/
         fi
         aliyunpan recycle delete -all
         echo y | aliyunpan logout
