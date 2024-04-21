@@ -143,7 +143,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ${{ env.build_date }}-${{ matrix.model }}-${{ matrix.tag.version }}
-        path: ${{ env.WORKDIR }}/rom/*.gz
+        path: ${{ env.WORKDIR }}/rom/*.*
 
     - name: Install aliyunpan & login
       working-directory: /builder
