@@ -20,6 +20,7 @@ jobs:
           - nanopi-r4s
           - nanopi-r5s
           - x86_64
+          - netgear_r8500
         tag:
           - type: rc2
             version: openwrt-23.05
@@ -144,6 +145,8 @@ jobs:
           device_id=${{ secrets.device_id_r5s_minimal }}
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
           device_id=${{ secrets.device_id_x86_minimal }}
+        elif [ "${{ matrix.model }}" = "netgear_r8500" ]; then
+          device_id=${{ secrets.device_id_netgear_minimal }}
         fi
         sudo curl -L ${{ secrets.aliyunpan_go }} -o /bin/aliyunpan --progress-bar
         sudo chmod 0755 /bin/aliyunpan
@@ -166,26 +169,31 @@ jobs:
         export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
         version=$(cat openwrt/version.txt)
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
-          aliyunpan upload --timeout 30 --retry 10 --ow info/manifest.txt openwrt/nanopi-r4s/minimal/${{ matrix.tag.version }}/$version/
           aliyunpan upload --timeout 30 --retry 10 --ow info/config.buildinfo openwrt/nanopi-r4s/minimal/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 30 --retry 10 --ow info/manifest.txt openwrt/nanopi-r4s/minimal/${{ matrix.tag.version }}/$version/
           aliyunpan upload --timeout 30 --retry 10 --ow info/sha256sums.txt openwrt/nanopi-r4s/minimal/${{ matrix.tag.version }}/$version/
           aliyunpan upload --timeout 30 --retry 10 --ow rom/*-r4s-ext4-sysupgrade.img.gz openwrt/nanopi-r4s/minimal/${{ matrix.tag.version }}/$version/
           aliyunpan upload --timeout 30 --retry 10 --ow rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/nanopi-r4s/minimal/${{ matrix.tag.version }}/$version/
         elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
-          aliyunpan upload --timeout 30 --retry 10 --ow info/manifest.txt openwrt/nanopi-r5s/minimal/${{ matrix.tag.version }}/$version/
           aliyunpan upload --timeout 30 --retry 10 --ow info/config.buildinfo openwrt/nanopi-r5s/minimal/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 30 --retry 10 --ow info/manifest.txt openwrt/nanopi-r5s/minimal/${{ matrix.tag.version }}/$version/
           aliyunpan upload --timeout 30 --retry 10 --ow info/sha256sums.txt openwrt/nanopi-r5s/minimal/${{ matrix.tag.version }}/$version/
           aliyunpan upload --timeout 30 --retry 10 --ow rom/*-r5c-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/minimal/${{ matrix.tag.version }}/$version/
           aliyunpan upload --timeout 30 --retry 10 --ow rom/*-r5c-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/minimal/${{ matrix.tag.version }}/$version/
           aliyunpan upload --timeout 30 --retry 10 --ow rom/*-r5s-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/minimal/${{ matrix.tag.version }}/$version/
           aliyunpan upload --timeout 30 --retry 10 --ow rom/*-r5s-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/minimal/${{ matrix.tag.version }}/$version/
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
-          aliyunpan upload --timeout 30 --retry 10 --ow info/manifest.txt openwrt/x86_64/minimal/${{ matrix.tag.version }}/$version/
           aliyunpan upload --timeout 30 --retry 10 --ow info/config.buildinfo openwrt/x86_64/minimal/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 30 --retry 10 --ow info/manifest.txt openwrt/x86_64/minimal/${{ matrix.tag.version }}/$version/
           aliyunpan upload --timeout 30 --retry 10 --ow info/sha256sums.txt openwrt/x86_64/minimal/${{ matrix.tag.version }}/$version/
           aliyunpan upload --timeout 30 --retry 10 --ow rom/*-generic-rootfs.tar.gz openwrt/x86_64/minimal/${{ matrix.tag.version }}/$version/
           aliyunpan upload --timeout 30 --retry 10 --ow rom/*-ext4-combined-efi.img.gz openwrt/x86_64/minimal/${{ matrix.tag.version }}/$version/
           aliyunpan upload --timeout 30 --retry 10 --ow rom/*-squashfs-combined-efi.img.gz openwrt/x86_64/minimal/${{ matrix.tag.version }}/$version/
+        elif [ "${{ matrix.model }}" = "netgear_r8500" ]; then
+          aliyunpan upload --timeout 30 --retry 10 --ow info/config.buildinfo openwrt/netgear-r8500/minimal/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 30 --retry 10 --ow info/manifest.txt openwrt/netgear-r8500/minimal/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 30 --retry 10 --ow info/sha256sums.txt openwrt/netgear-r8500/minimal/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 30 --retry 10 --ow rom/*.chk openwrt/netgear-r8500/minimal/${{ matrix.tag.version }}/$version/
         fi
         aliyunpan recycle delete -all
         echo y | aliyunpan logout

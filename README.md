@@ -2,7 +2,7 @@
   <img width="400px" src="https://camo.githubusercontent.com/55640468a9152e9657a07fea92ac6717db2b8f2e875e821bbc23390286356209/68747470733a2f2f63646e2e636f6f6c75632e636f6d2f7234732f4f70656e5772745f4c6f676f2e737667" />
 </p>
 
-<h1 align="center">OpenWrt for FriendlyElec NanoPi R4S / R5S / R5C & X86_64</h1>
+<h1 align="center">OpenWrt for FriendlyElec NanoPi R4S / R5S / R5C & X86_64 & Netgear R8500</h1>
 
 <p align="center">
   <img width="300px" src="https://camo.githubusercontent.com/c35d7564ca447b87cbaab1d30ead23345f3c861cba8c02163bcfb2c5e66a460b/68747470733a2f2f63646e2e636f6f6c75632e636f6d2f7234732f7235735f2e77656270" />
@@ -21,6 +21,8 @@
 **NanoPi R5S/R5C: https://r5s.cooluc.com**
 
 **X86_64: https://x86.cooluc.com**
+
+**Netgear R8500: https://r8500.cooluc.com**
 
 **GitHub：https://github.com/sbwml/builder/releases**
 
