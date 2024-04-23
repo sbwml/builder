@@ -132,6 +132,11 @@ jobs:
           cp -a openwrt/bin/targets/x86/*/*-x86-64-generic.manifest info/manifest.txt
           cp -a openwrt/bin/targets/x86/*/config.buildinfo info/config.buildinfo
           cd rom && sha256sum * > ../info/sha256sums.txt
+        elif [ "${{ matrix.model }}" = "netgear_r8500" ]; then
+          cp -a openwrt/bin/targets/bcm53xx/generic/*-bcm53xx-generic-netgear_r8500-squashfs.chk rom/
+          cp -a openwrt/bin/targets/bcm53xx/generic/*.manifest info/manifest.txt
+          cp -a openwrt/bin/targets/bcm53xx/generic/config.buildinfo info/config.buildinfo
+          cd rom && sha256sum * > ../info/sha256sums.txt
         fi
         cd ..
         tar zcf rom/buildinfo_${{ matrix.model }}.tar.gz info
@@ -161,7 +166,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.model }}-${{ matrix.tag.version }}
-        path: ${{ env.WORKDIR }}/rom/*.gz
+        path: ${{ env.WORKDIR }}/rom/*.*
 
     - name: Upload Firmware - Minimal
       working-directory: /builder
