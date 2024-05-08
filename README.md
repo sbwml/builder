@@ -2,7 +2,7 @@
   <img width="400px" src="https://camo.githubusercontent.com/55640468a9152e9657a07fea92ac6717db2b8f2e875e821bbc23390286356209/68747470733a2f2f63646e2e636f6f6c75632e636f6d2f7234732f4f70656e5772745f4c6f676f2e737667" />
 </p>
 
-<h1 align="center">OpenWrt for FriendlyElec NanoPi R4S / R5S / R5C & X86_64 & Netgear R8500</h1>
+<h1 align="center">OpenWrt for FriendlyElec NanoPi R4S / R5S & X86_64 & Netgear R8500</h1>
 
 <p align="center">
   <img width="300px" src="https://camo.githubusercontent.com/c35d7564ca447b87cbaab1d30ead23345f3c861cba8c02163bcfb2c5e66a460b/68747470733a2f2f63646e2e636f6f6c75632e636f6d2f7234732f7235735f2e77656270" />
@@ -18,7 +18,7 @@
 
 **NanoPi R4S: https://r4s.cooluc.com**
 
-**NanoPi R5S/R5C: https://r5s.cooluc.com**
+**NanoPi R5S: https://r5s.cooluc.com**
 
 **X86_64: https://x86.cooluc.com**
 
@@ -48,14 +48,14 @@
 
 | 基本                                              | 状态 | 基本                         | 状态 |
 |:-------------------------------------------------:|:----:|:----------------------------:|:----:|
-| kmod 内核模块安装                                 | ✅   | nft-fullcone / bcm-fullcone  | ✅   |
+| kmod 内核模块安装                                 | ✅   | 全锥型 NAT（NFT、BCM 双方案）| ✅   |
 | SS AES 硬件加速                                   | ✅   | 构建优化（O3、LTO）          | ✅   |
-| GPU 硬件加速                                      | ✅   | 在线 OTA 升级（squashfs）    | ✅   |
-| HDMI 终端输出                                     | ✅   | 固件重置（squashfs）         | ✅   |
-| RTC 时钟 (HYM8563)                                | ✅   | microSD 启动优先             | ✅   |
+| GPU 硬件加速                                      | ✅   | 内核/模块 优化（LLVM LTO）   | ✅   |
+| HDMI 终端输出                                     | ✅   | 在线 OTA 升级（squashfs）    | ✅   |
+| RTC 时钟 (HYM8563)                                | ✅   | 固件重置（squashfs）         | ✅   |
 | BBRv3 拥塞控制                                    | ✅   | LLVM-BPF 支持                | ✅   |
-| KVM 虚拟化加速                                    | ✅   | Shortcut-FE（支持 UDP 入站） | ✅   |
-| NGINX & CURL HTTP3/QUIC 支持                      | ✅   | LRNG（v54）                  | ✅   |
+| KVM 虚拟化加速（[QEMU](https://bin.cooluc.com/)） | ✅   | Shortcut-FE（支持 UDP 入站） | ✅   |
+| NGINX & CURL HTTP3/QUIC 支持                      | ✅   | LRNG（v53）                  | ✅   |
 
 | 内置插件                 | 状态 | 内置插件         | 状态 |
 |:------------------------:|:----:|:----------------:|:----:|
