@@ -104,8 +104,9 @@ jobs:
       run: |
         export PATH="/opt/clang/bin:$PATH"
         mkdir /opt/clang
-        curl -LO https://github.com/sbwml/ubuntu-llvm-project/releases/download/17.0.6/clang-17.0.6-x86_64-ubuntu-22.04.tar.xz --progress-bar
-        sudo tar --strip-components=1 -C /opt/clang -xf clang-17.0.6-x86_64-ubuntu-22.04.tar.xz
+        curl -LO https://github.com/sbwml/redhat-llvm-project/releases/download/18.1.6/clang-18.1.6-x86_64-redhat-linux.tar.xz --progress-bar
+        sudo tar --strip-components=1 -C /opt/clang -xf clang-18.1.6-x86_64-redhat-linux.tar.xz
+        rm -rf clang-18.1.6-x86_64-redhat-linux.tar.xz
         clang --version
 
     - name: Compile OpenWrt
