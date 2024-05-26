@@ -54,8 +54,8 @@
 | HDMI 终端输出                                     | ✅   | 在线 OTA 升级（squashfs）    | ✅   |
 | RTC 时钟 (HYM8563)                                | ✅   | 固件重置（squashfs）         | ✅   |
 | BBRv3 拥塞控制                                    | ✅   | LLVM-BPF 支持                | ✅   |
-| KVM 虚拟化加速（[QEMU](https://bin.cooluc.com/)） | ✅   | Shortcut-FE（支持 UDP 入站） | ✅   |
-| NGINX & CURL HTTP3/QUIC 支持                      | ✅   | LRNG（v53）                  | ✅   |
+| KVM 虚拟化加速                                    | ✅   | Shortcut-FE（支持 UDP 入站）  | ✅   |
+| NGINX & CURL HTTP3/QUIC 支持                      | ✅   | LRNG（v54）                  | ✅   |
 
 | 内置插件                 | 状态 | 内置插件         | 状态 |
 |:------------------------:|:----:|:----------------:|:----:|

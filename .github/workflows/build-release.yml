@@ -17,6 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         model:
+          - armv8
           - nanopi-r4s
           - nanopi-r5s
           - x86_64
@@ -42,7 +43,7 @@ jobs:
     - name: Set release env
       run: |
         echo WORKDIR="/builder" >> "$GITHUB_ENV"
-        if [[ ${{ matrix.model }} != "nanopi-r4s" ]]; then
+        if [[ ${{ matrix.model }} != "nanopi-r4s" ]] && [[ ${{ matrix.model }} != "armv8" ]]; then
           echo "release_kmod=true" >> "$GITHUB_ENV"
         fi
         if [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
@@ -155,6 +156,16 @@ jobs:
           cp -a openwrt/bin/targets/bcm53xx/generic/*.manifest info/manifest.txt
           cp -a openwrt/bin/targets/bcm53xx/generic/config.buildinfo info/config.buildinfo
           cd rom && sha256sum * > ../info/sha256sums.txt
+        elif [ "${{ matrix.model }}" = "armv8" ]; then
+          tar zcf rom/u-boot-qemu_armv8.tar.gz -C openwrt/bin/targets/armsr/armv8*/ ./u-boot-qemu_armv8
+          cp -a openwrt/bin/targets/armsr/armv8*/*-generic-initramfs-kernel.bin rom/
+          cp -a openwrt/bin/targets/armsr/armv8*/*-generic-kernel.bin rom/
+          cp -a openwrt/bin/targets/armsr/armv8*/*-generic-ext4-combined.img.gz rom/
+          cp -a openwrt/bin/targets/armsr/armv8*/*-generic-squashfs-combined.img.gz rom/
+          cp -a openwrt/bin/targets/armsr/armv8*/*-rootfs.tar.gz rom/
+          cp -a openwrt/bin/targets/armsr/armv8*/*.manifest info/manifest.txt
+          cp -a openwrt/bin/targets/armsr/armv8*/config.buildinfo info/config.buildinfo
+          cd rom && sha256sum * > ../info/sha256sums.txt
         fi
         cd ..
         tar zcf rom/buildinfo_${{ matrix.model }}.tar.gz info
@@ -207,6 +218,7 @@ jobs:
         event-type: sync
 
     - name: Install aliyunpan & login
+      if: ${{ matrix.model != 'armv8' }}
       continue-on-error: true
       working-directory: /builder
       run: |
@@ -229,6 +241,7 @@ jobs:
         echo $aliyun_token | aliyunpan login
 
     - name: Upload Firmware - releases
+      if: ${{ matrix.model != 'armv8' }}
       id: upload
       continue-on-error: true
       working-directory: /builder
@@ -272,7 +285,7 @@ jobs:
         echo y | aliyunpan logout
 
     - name: Retry Upload Firmware - releases
-      if: steps.upload.outcome == 'failure'
+      if: steps.upload.outcome == 'failure' && ${{ matrix.model != 'armv8' }}
       run: |
         sshpass -p ${{ secrets.user_password }} ssh -o StrictHostKeyChecking=no ${{ secrets.user_name }}@${{ secrets.ftp_address }} >/dev/null 2>&1
         sshpass -p ${{ secrets.user_password }} ssh ${{ secrets.user_name }}@${{ secrets.ftp_address }} "/opt/sbin/fw-upload ${{ matrix.model }}"
