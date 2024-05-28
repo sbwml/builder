@@ -168,8 +168,8 @@ jobs:
           tar zcf rom/u-boot-qemu_armv8.tar.gz -C openwrt/bin/targets/armsr/armv8*/ ./u-boot-qemu_armv8
           cp -a openwrt/bin/targets/armsr/armv8*/*-generic-initramfs-kernel.bin rom/
           cp -a openwrt/bin/targets/armsr/armv8*/*-generic-kernel.bin rom/
-          cp -a openwrt/bin/targets/armsr/armv8*/*-generic-ext4-combined.img.gz rom/
-          cp -a openwrt/bin/targets/armsr/armv8*/*-generic-squashfs-combined.img.gz rom/
+          cp -a openwrt/bin/targets/armsr/armv8*/*-generic-ext4-combined-efi.img.gz rom/
+          cp -a openwrt/bin/targets/armsr/armv8*/*-generic-squashfs-combined-efi.img.gz rom/
           cp -a openwrt/bin/targets/armsr/armv8*/*-rootfs.tar.gz rom/
           cp -a openwrt/bin/targets/armsr/armv8*/*.manifest info/manifest.txt
           cp -a openwrt/bin/targets/armsr/armv8*/config.buildinfo info/config.buildinfo
