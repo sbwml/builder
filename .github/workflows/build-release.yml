@@ -43,7 +43,7 @@ jobs:
     - name: Set release env
       run: |
         echo WORKDIR="/builder" >> "$GITHUB_ENV"
-        if [[ ${{ matrix.model }} != "nanopi-r4s" ]] && [[ ${{ matrix.model }} != "armv8" ]]; then
+        if [[ ${{ matrix.model }} != "nanopi-r4s" ]]; then
           echo "release_kmod=true" >> "$GITHUB_ENV"
         fi
         if [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
@@ -52,6 +52,8 @@ jobs:
           echo "kmod_repo=kmod-x86_64" >> "$GITHUB_ENV"
         elif [ "${{ matrix.model }}" = "netgear_r8500" ]; then
           echo "kmod_repo=kmod-bcm53xx" >> "$GITHUB_ENV"
+        elif [ "${{ matrix.model }}" = "armv8" ]; then
+          echo "kmod_repo=kmod-armsr-armv8" >> "$GITHUB_ENV"
         fi
 
     - name: Free disk space
