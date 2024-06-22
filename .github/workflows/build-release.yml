@@ -7,9 +7,8 @@ on:
 
 jobs:
   build:
-    if: github.event.repository.owner.id == github.event.sender.id
     name: Build ${{ matrix.model }}-${{ matrix.tag.version }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     defaults:
       run:
         shell: bash
@@ -27,21 +26,11 @@ jobs:
             version: openwrt-23.05
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@main
-
-    - name: Set time zone
-      run: sudo timedatectl set-timezone 'Asia/Shanghai'
-
-    - name: Show system
+    - name: Setup variables
       run: |
-        lscpu
-        free -h
-        df -Th
-        uname -a
-
-    - name: Set release env
-      run: |
+        sudo timedatectl set-timezone 'Asia/Shanghai'
+        git config --global user.name 'actions'
+        git config --global user.email 'action@github.com'
         echo WORKDIR="/builder" >> "$GITHUB_ENV"
         if [[ ${{ matrix.model }} != "nanopi-r4s" ]]; then
           echo "release_kmod=true" >> "$GITHUB_ENV"
@@ -56,76 +45,36 @@ jobs:
           echo "kmod_repo=kmod-armsr-armv8" >> "$GITHUB_ENV"
         fi
 
-    - name: Free disk space
+    - name: Show system
       run: |
-        sudo rm -rf /etc/apt/sources.list.d
-        sudo bash -c "curl -s https://us.cooluc.com/ubuntu-apt/sources-22.04.list > /etc/apt/sources.list"
-        sudo swapoff -a
-        sudo rm -f /swapfile /mnt/swapfile
-        sudo docker image prune -a -f
-        sudo systemctl stop docker
-        sudo snap set system refresh.retain=2
-        sudo apt-get -y purge firefox clang* ghc* google* llvm* mono* mongo* mysql* php*
-        sudo apt-get -y autoremove --purge
-        sudo apt-get clean
-        sudo rm -rf /etc/mysql /etc/php /usr/lib/jvm /usr/libexec/docker /usr/local /usr/src/* /var/lib/docker /var/lib/gems /var/lib/mysql /var/lib/snapd /etc/skel /opt/{microsoft,az,hostedtoolcache,cni,mssql-tools,pipx} /usr/share/{az*,dotnet,swift,miniconda,gradle*,java,kotlinc,ri,sbt} /root/{.sbt,.local,.npm}
-        sudo sed -i '/NVM_DIR/d;/skel/d' /root/{.bashrc,.profile}
-        rm -rf ~/{.cargo,.dotnet,.rustup}
-        df -Th
+        echo -e "\n\e[1;32mCPU:\e[0m"
+        echo "$(grep 'model name' /proc/cpuinfo | head -1 | awk -F ': ' '{print $2}') ($(grep 'cpu MHz' /proc/cpuinfo | head -1 | awk -F ': ' '{print $2}')MHz) x $(grep processor /proc/cpuinfo  | wc -l)"
+        echo -e "\n\e[1;32mMemory:\e[0m"
+        free -h
+        echo -e "\n\e[1;32mStorage:\e[0m"
+        df -Th / /mnt
+        echo -e "\n\e[1;32mSystem:\e[0m"
+        lsb_release -a
+        echo -e "\n\e[1;32mKernel:\e[0m"
+        uname -a
+        echo
 
-    - name: Create Swap
-      run: |
-        sudo dd if=/dev/zero of=/mnt/swapfile bs=1M count=8192
-        sudo chmod 600 /mnt/swapfile
-        sudo mkswap /mnt/swapfile
-        sudo swapon /mnt/swapfile
-        free -h | grep -i swap
+    - name: Free disk space
+      uses: sbwml/actions@free-disk
+      with:
+        build-mount-path: /builder
 
     - name: Build System Setup
-      env:
-        DEBIAN_FRONTEND: noninteractive
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential flex bison cmake g++ gawk gcc-multilib g++-multilib gettext git libfuse-dev libncurses5-dev libssl-dev python3 python3-pip python3-ply python3-distutils python3-pyelftools rsync unzip zlib1g-dev file wget subversion patch upx-ucl autoconf automake curl asciidoc binutils bzip2 lib32gcc-s1 libc6-dev-i386 uglifyjs msmtp texinfo libreadline-dev libglib2.0-dev xmlto libelf-dev libtool autopoint antlr3 gperf ccache swig coreutils haveged scons libpython3-dev rename qemu-utils
-        sudo apt-get clean
-        git config --global user.name 'GitHub Actions' && git config --global user.email 'noreply@github.com'
-
-    - name: Create VG & LV
-      run: |
-        mnt_size=$(df -h /mnt | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//')
-        root_size=$(expr $(df -h / | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 2)
-        sudo truncate -s "$mnt_size"G /mnt/mnt.img
-        sudo truncate -s "$root_size"G /root.img
-        sudo losetup /dev/loop6 /mnt/mnt.img
-        sudo losetup /dev/loop7 /root.img
-        sudo pvcreate /dev/loop6
-        sudo pvcreate /dev/loop7
-        sudo vgcreate github /dev/loop6 /dev/loop7
-        sudo lvcreate -n runner -l 100%FREE github
-        sudo mkfs.xfs /dev/github/runner
-
-    - name: Mount LV
-      run: |
-        sudo mkdir -p /builder
-        sudo mount /dev/github/runner /builder
-        sudo chown -R runner.runner /builder
-        df -Th
+      uses: sbwml/actions@openwrt-build-setup
 
     - name: Install LLVM
-      run: |
-        export PATH="/opt/clang/bin:$PATH"
-        mkdir /opt/clang
-        curl -LO https://github.com/sbwml/redhat-llvm-project/releases/download/18.1.6/clang-18.1.6-x86_64-redhat-linux.tar.xz --progress-bar
-        sudo tar --strip-components=1 -C /opt/clang -xf clang-18.1.6-x86_64-redhat-linux.tar.xz
-        rm -rf clang-18.1.6-x86_64-redhat-linux.tar.xz
-        clang --version
+      uses: sbwml/actions@install-llvm
 
     - name: Compile OpenWrt
       id: compile
       continue-on-error: true
       working-directory: /builder
       run: |
-        export PATH="/opt/clang/bin:$PATH"
         [ "${{ matrix.model }}" != "netgear_r8500" ] && export KERNEL_CLANG_LTO=y
         BUILD_FAST=y ENABLE_OTA=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y USE_GCC15=y USE_MOLD=y bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
         cd openwrt
@@ -136,7 +85,6 @@ jobs:
       if: steps.compile.outcome == 'failure'
       working-directory: /builder
       run: |
-        export PATH="/opt/clang/bin:$PATH"
         cd openwrt
         make V=s
 
@@ -202,7 +150,7 @@ jobs:
         name: OpenWrt-${{ env.latest_release }}
         allowUpdates: true
         tag: ${{ env.latest_release }}
-        commit: master
+        commit: main
         replacesArtifacts: true
         token: ${{ secrets.workflow_token }}
         artifacts: ${{ env.WORKDIR }}/rom/*
@@ -214,7 +162,7 @@ jobs:
         name: OpenWrt-${{ env.latest_release }}
         allowUpdates: true
         tag: ${{ env.latest_release }}
-        commit: master
+        commit: main
         replacesArtifacts: true
         token: ${{ secrets.workflow_token }}
         artifacts: ${{ env.WORKDIR }}/openwrt/*-*.tar.gz
@@ -241,7 +189,7 @@ jobs:
         elif [ "${{ matrix.model }}" = "netgear_r8500" ]; then
           device_id=${{ secrets.device_id_netgear }}
         fi
-        sudo curl -L ${{ secrets.aliyunpan_go }} -o /bin/aliyunpan --progress-bar
+        sudo wget -q ${{ secrets.aliyunpan_go }} -O /bin/aliyunpan
         sudo chmod 0755 /bin/aliyunpan
         sudo sh -c 'echo "${{ secrets.aliyunpan_us_node }} api.alipan.com auth.alipan.com www.alipan.com" >> /etc/hosts'
         export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
@@ -295,10 +243,10 @@ jobs:
         echo y | aliyunpan logout
 
     - name: Retry Upload Firmware - releases
-      if: steps.upload.outcome == 'failure' && ${{ matrix.model != 'armv8' }}
+      if: steps.upload.outcome == 'failure'
       run: |
-        sshpass -p ${{ secrets.user_password }} ssh -o StrictHostKeyChecking=no ${{ secrets.user_name }}@${{ secrets.ftp_address }} >/dev/null 2>&1
-        sshpass -p ${{ secrets.user_password }} ssh ${{ secrets.user_name }}@${{ secrets.ftp_address }} "/opt/sbin/fw-upload ${{ matrix.model }}"
+        sshpass -p ${{ secrets.user_password }} ssh -o StrictHostKeyChecking=no root@${{ secrets.ftp_address }} >/dev/null 2>&1
+        sshpass -p ${{ secrets.user_password }} ssh root@${{ secrets.ftp_address }} "/opt/sbin/fw-upload ${{ matrix.model }}"
 
     - name: Release OTA
       uses: sbwml/FTP-Deploy-Action@master
