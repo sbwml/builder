@@ -182,6 +182,7 @@ jobs:
       if: ${{ matrix.model != 'armv8' }}
       continue-on-error: true
       working-directory: /builder
+      timeout-minutes: 1
       run: |
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
           device_id=${{ secrets.device_id_r4s }}
@@ -206,6 +207,7 @@ jobs:
       id: upload
       continue-on-error: true
       working-directory: /builder
+      timeout-minutes: 45
       run: |
         export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
         version=$(cat openwrt/version.txt)
