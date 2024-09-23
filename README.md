@@ -1,11 +1,11 @@
 <p align="center">
-  <img width="400px" src="https://camo.githubusercontent.com/55640468a9152e9657a07fea92ac6717db2b8f2e875e821bbc23390286356209/68747470733a2f2f63646e2e636f6f6c75632e636f6d2f7234732f4f70656e5772745f4c6f676f2e737667" />
+  <img width="400px" src="https://github.com/user-attachments/assets/6d37cd69-a232-4444-9f91-30e5942a8938" />
 </p>
 
 <h1 align="center">OpenWrt for FriendlyElec NanoPi R4S / R5S & X86_64 & Netgear R8500</h1>
 
 <p align="center">
-  <img width="300px" src="https://camo.githubusercontent.com/c35d7564ca447b87cbaab1d30ead23345f3c861cba8c02163bcfb2c5e66a460b/68747470733a2f2f63646e2e636f6f6c75632e636f6d2f7234732f7235735f2e77656270" />
+  <img width="300px" src="https://cdn.cooluc.com/r4s/r5s_.webp" />
 </p>
 
 <p align="center">
@@ -56,6 +56,7 @@
 | BBRv3 拥塞控制                                    | ✅   | LLVM-BPF 支持                | ✅   |
 | KVM 虚拟化加速                                    | ✅   | Shortcut-FE（支持 UDP 入站）  | ✅   |
 | NGINX & CURL HTTP3/QUIC 支持                      | ✅   | LRNG（v54）                  | ✅   |
+| TCP Brutal 拥塞控制                               | ✅   |                             |      |
 
 | 内置插件                 | 状态 | 内置插件         | 状态 |
 |:------------------------:|:----:|:----------------:|:----:|
@@ -127,7 +128,6 @@
 <details>
 <summary><b>├── 服务</b></summary>
 　├── PassWall<br/>
-　├── ShadowSocksR Plus+<br/>
 　├── HomeProxy<br/>
 　├── qBittorrent<br/>
 　├── MosDNS<br/>
@@ -301,25 +301,7 @@ bash -c "$(curl -sS https://r5s.cooluc.com/daed-install.sh)"
 
 ------
 
-## 概览
-
 ![](https://cdn.cooluc.com/r4s/1.webp)
-
-![](https://cdn.cooluc.com/r4s/menu.webp)
-
-![](https://cdn.cooluc.com/r4s/23.05.02.webp)
-
-![](https://cdn.cooluc.com/r4s/nanopi-ota.webp)
-
-![](https://cdn.cooluc.com/r4s/firewall.webp)
-
-![](https://cdn.cooluc.com/r4s/4.webp)
-
-![](https://cdn.cooluc.com/r4s/5.webp)
-
-![](https://cdn.cooluc.com/r4s/udp2.webp)
-
-![](https://cdn.cooluc.com/r4s/daed.webp)
 
 ------
 

@@ -55,7 +55,7 @@ jobs:
       uses: sbwml/actions@openwrt-build-setup
 
     - name: Install LLVM
-      uses: sbwml/actions@install-llvm
+      uses: sbwml/actions@install-llvm-19
 
     - name: Compile OpenWrt
       id: compile
@@ -173,7 +173,7 @@ jobs:
         echo y | aliyunpan logout
 
     - name: Release OTA
-      uses: sbwml/FTP-Deploy-Action@master
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
         server: ${{ secrets.ftp_address }}
         username: ${{ matrix.model }}-minimal
