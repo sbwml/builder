@@ -129,7 +129,28 @@ jobs:
         token: ${{ secrets.workflow_token }}
         artifacts: |
           ${{ env.build_dir }}/rom/*
+
+    - name: Release kernel modules
+      if: ${{ matrix.model != 'nanopi-r4s' }}
+      uses: ncipollo/release-action@v1.14.0
+      with:
+        name: OpenWrt-Test-${{ env.latest_release }}
+        allowUpdates: true
+        prerelease: true
+        tag: test-${{ env.latest_release }}
+        commit: main
+        replacesArtifacts: true
+        token: ${{ secrets.workflow_token }}
+        artifacts: |
           ${{ env.build_dir }}/openwrt/*-*.tar.gz
+
+    - name: Sync kernel modules
+      if: ${{ matrix.model != 'nanopi-r4s' }}
+      uses: peter-evans/repository-dispatch@v3
+      with:
+        token: ${{ secrets.workflow_token }}
+        repository: sbwml/openwrt_core
+        event-type: sync
 
     - name: Release OTA
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5

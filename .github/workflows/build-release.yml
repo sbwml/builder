@@ -158,6 +158,18 @@ jobs:
         token: ${{ secrets.workflow_token }}
         artifacts: |
           ${{ env.build_dir }}/rom/*
+
+    - name: Release kernel modules
+      if: ${{ matrix.model != 'nanopi-r4s' }}
+      uses: ncipollo/release-action@v1.14.0
+      with:
+        name: OpenWrt-${{ env.latest_release }}
+        allowUpdates: true
+        tag: ${{ env.latest_release }}
+        commit: main
+        replacesArtifacts: true
+        token: ${{ secrets.workflow_token }}
+        artifacts: |
           ${{ env.build_dir }}/openwrt/*-*.tar.gz
 
     - name: Sync kernel modules
