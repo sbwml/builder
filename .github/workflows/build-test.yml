@@ -53,9 +53,6 @@ jobs:
     - name: Build System Setup
       uses: sbwml/actions@openwrt-build-setup
 
-    - name: Install LLVM
-      uses: sbwml/actions@install-llvm-19
-
     - name: Compile OpenWrt
       id: compile
       continue-on-error: true
