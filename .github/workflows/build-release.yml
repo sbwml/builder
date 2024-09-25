@@ -31,7 +31,7 @@ jobs:
         sudo timedatectl set-timezone 'Asia/Shanghai'
         git config --global user.name 'actions'
         git config --global user.email 'action@github.com'
-        echo WORKDIR="/builder" >> "$GITHUB_ENV"
+        echo build_dir="/builder" >> "$GITHUB_ENV"
         if [[ ${{ matrix.model }} != "nanopi-r4s" ]]; then
           echo "release_kmod=true" >> "$GITHUB_ENV"
         fi
@@ -156,19 +156,9 @@ jobs:
         commit: main
         replacesArtifacts: true
         token: ${{ secrets.workflow_token }}
-        artifacts: ${{ env.WORKDIR }}/rom/*
-
-    - name: Release kmods
-      if: env.release_kmod == 'true'
-      uses: ncipollo/release-action@v1.14.0
-      with:
-        name: OpenWrt-${{ env.latest_release }}
-        allowUpdates: true
-        tag: ${{ env.latest_release }}
-        commit: main
-        replacesArtifacts: true
-        token: ${{ secrets.workflow_token }}
-        artifacts: ${{ env.WORKDIR }}/openwrt/*-*.tar.gz
+        artifacts: |
+          ${{ env.build_dir }}/rom/*
+          ${{ env.build_dir }}/openwrt/*-*.tar.gz
 
     - name: Sync kernel modules
       if: env.release_kmod == 'true'
@@ -207,7 +197,7 @@ jobs:
       id: upload
       continue-on-error: true
       working-directory: /builder
-      timeout-minutes: 45
+      timeout-minutes: 40
       run: |
         export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
         version=$(cat openwrt/version.txt)
@@ -256,8 +246,9 @@ jobs:
     - name: Release OTA
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
+        username: openwrt
         server: ${{ secrets.ftp_address }}
-        username: ${{ matrix.model }}
         password: ${{ secrets.ftp_password }}
-        local-dir: ${{ env.WORKDIR }}/openwrt/ota/
+        server-dir: release/${{ matrix.model }}/
+        local-dir: ${{ env.build_dir }}/openwrt/ota/
         dangerous-clean-slate: true

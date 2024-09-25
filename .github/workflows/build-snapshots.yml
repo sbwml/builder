@@ -30,7 +30,7 @@ jobs:
         sudo timedatectl set-timezone 'Asia/Shanghai'
         git config --global user.name 'actions'
         git config --global user.email 'action@github.com'
-        echo WORKDIR="/builder" >> "$GITHUB_ENV"
+        echo build_dir="/builder" >> "$GITHUB_ENV"
 
     - name: Show system
       run: |
@@ -109,7 +109,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ${{ env.build_date }}-${{ matrix.model }}-${{ matrix.tag.version }}
-        path: ${{ env.WORKDIR }}/rom/*.*
+        path: ${{ env.build_dir }}/rom/*.*
 
     - name: Install aliyunpan & login
       working-directory: /builder

@@ -1,4 +1,4 @@
-name: Build Testing
+name: Build testing
 
 on:
   workflow_dispatch:
@@ -29,7 +29,7 @@ jobs:
         sudo timedatectl set-timezone 'Asia/Shanghai'
         git config --global user.name 'actions'
         git config --global user.email 'action@github.com'
-        echo WORKDIR="/builder" >> "$GITHUB_ENV"
+        echo build_dir="/builder" >> "$GITHUB_ENV"
 
     - name: Show system
       run: |
@@ -127,4 +127,16 @@ jobs:
         commit: main
         replacesArtifacts: true
         token: ${{ secrets.workflow_token }}
-        artifacts: ${{ env.WORKDIR }}/rom/*
+        artifacts: |
+          ${{ env.build_dir }}/rom/*
+          ${{ env.build_dir }}/openwrt/*-*.tar.gz
+
+    - name: Release OTA
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        username: openwrt
+        server: ${{ secrets.ftp_address }}
+        password: ${{ secrets.ftp_password }}
+        server-dir: test/${{ matrix.model }}/
+        local-dir: ${{ env.build_dir }}/openwrt/ota/
+        dangerous-clean-slate: true
