@@ -22,7 +22,7 @@ jobs:
           - netgear_r8500
         tag:
           - type: dev
-            version: openwrt-23.05
+            version: openwrt-24.10
 
     steps:
     - name: Setup variables
@@ -134,7 +134,7 @@ jobs:
       run: |
         export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
         DATE=$(date "+%Y-%m-%d")
-        branch=23.05-SNAPSHOT
+        branch=24.10-SNAPSHOT
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
           aliyunpan upload --timeout 30 --retry 10 --ow info/config.buildinfo openwrt/nanopi-r4s/snapshots/$branch/$DATE/
           aliyunpan upload --timeout 30 --retry 10 --ow info/manifest.txt openwrt/nanopi-r4s/snapshots/$branch/$DATE/
