@@ -110,6 +110,7 @@ jobs:
 
     - name: Install aliyunpan & login
       working-directory: /builder
+      continue-on-error: true
       run: |
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
           device_id=${{ secrets.device_id_r4s_dev }}
@@ -132,6 +133,7 @@ jobs:
     - name: Upload Firmware - snapshots
       working-directory: /builder
       timeout-minutes: 20
+      continue-on-error: true
       run: |
         export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
         DATE=$(date "+%Y-%m-%d")
