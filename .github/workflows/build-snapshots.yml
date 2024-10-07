@@ -72,7 +72,7 @@ jobs:
       working-directory: /builder
       run: |
         cd openwrt
-        make V=s
+        make V=s IGNORE_ERRORS="n m"
 
     - name: Assemble Artifact
       working-directory: /builder
@@ -131,6 +131,7 @@ jobs:
 
     - name: Upload Firmware - snapshots
       working-directory: /builder
+      timeout-minutes: 20
       run: |
         export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
         DATE=$(date "+%Y-%m-%d")
@@ -164,3 +165,18 @@ jobs:
         fi
         aliyunpan recycle delete -all
         echo y | aliyunpan logout
+
+    - name: Copy build info
+      working-directory: /builder
+      run: |
+        cp -a info/* rom/
+
+    - name: Upload Firmware - FTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        dangerous-clean-slate: true
+        username: snapshot
+        server: ${{ secrets.ftp_address }}
+        password: ${{ secrets.ftp_password }}
+        server-dir: ${{ matrix.model }}/
+        local-dir: ${{ env.build_dir }}/rom/
