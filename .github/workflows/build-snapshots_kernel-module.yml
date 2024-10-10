@@ -1,0 +1,93 @@
+name: Build testing kernel modules
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build ${{ matrix.model }}-${{ matrix.tag.version }}
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        model:
+          - armv8
+          - nanopi-r4s
+          - nanopi-r5s
+          - x86_64
+          - netgear_r8500
+        tag:
+          - type: dev
+
+    steps:
+    - name: Setup variables
+      run: |
+        sudo timedatectl set-timezone 'Asia/Shanghai'
+        git config --global user.name 'actions'
+        git config --global user.email 'action@github.com'
+        echo build_dir="/builder" >> "$GITHUB_ENV"
+
+    - name: Show system
+      run: |
+        echo -e "\n\e[1;32mCPU:\e[0m"
+        echo "$(grep 'model name' /proc/cpuinfo | head -1 | awk -F ': ' '{print $2}') ($(grep 'cpu MHz' /proc/cpuinfo | head -1 | awk -F ': ' '{print $2}')MHz) x $(grep processor /proc/cpuinfo  | wc -l)"
+        echo -e "\n\e[1;32mMemory:\e[0m"
+        free -h
+        echo -e "\n\e[1;32mStorage:\e[0m"
+        df -Th / /mnt
+        echo -e "\n\e[1;32mSystem:\e[0m"
+        lsb_release -a
+        echo -e "\n\e[1;32mKernel:\e[0m"
+        uname -a
+        echo
+
+    - name: Free disk space
+      uses: sbwml/actions@free-disk
+      with:
+        build-mount-path: /builder
+
+    - name: Build System Setup
+      uses: sbwml/actions@openwrt-build-setup
+
+    - name: Compile OpenWrt
+      id: compile
+      continue-on-error: true
+      working-directory: /builder
+      env:
+        git_password: ${{ secrets.ftp_password }}
+      run: |
+        [ "${{ matrix.model }}" != "netgear_r8500" ] && export KERNEL_CLANG_LTO=y
+        export TESTING_KERNEL=y BUILD_FAST=y ENABLE_OTA=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y USE_GCC15=y ENABLE_MOLD=y MINIMAL_BUILD=y
+        bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
+
+    - name: Extensive logs after a failed compilation
+      if: steps.compile.outcome == 'failure'
+      working-directory: /builder
+      run: |
+        cd openwrt
+        make V=s IGNORE_ERRORS="n m"
+
+    - name: Release kernel modules
+      if: ${{ matrix.model != 'nanopi-r4s' }}
+      uses: ncipollo/release-action@v1.14.0
+      with:
+        name: kmod-snapshot
+        allowUpdates: true
+        prerelease: true
+        tag: snapshot
+        commit: main
+        replacesArtifacts: true
+        token: ${{ secrets.workflow_token }}
+        artifacts: |
+          ${{ env.build_dir }}/openwrt/*-*.tar.gz
+
+    - name: Sync kernel modules
+      if: ${{ matrix.model != 'nanopi-r4s' }}
+      uses: peter-evans/repository-dispatch@v3
+      with:
+        token: ${{ secrets.workflow_token }}
+        repository: sbwml/openwrt_core
+        event-type: sync
