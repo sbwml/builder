@@ -1,0 +1,289 @@
+name: Build releases
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [release]
+
+jobs:
+  build:
+    name: Build ${{ matrix.model }}-${{ matrix.tag.version }}
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        model:
+          - armv8
+          - nanopi-r4s
+          - nanopi-r5s
+          - x86_64
+          - netgear_r8500
+        tag:
+          - type: rc2
+            version: openwrt-24.10
+
+    steps:
+    - name: Setup variables
+      run: |
+        sudo timedatectl set-timezone 'Asia/Shanghai'
+        git config --global user.name 'actions'
+        git config --global user.email 'action@github.com'
+        echo build_dir="/builder" >> "$GITHUB_ENV"
+        if [[ ${{ matrix.model }} != "nanopi-r4s" ]]; then
+          echo "release_kmod=true" >> "$GITHUB_ENV"
+        fi
+        if [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
+          echo "kmod_repo=kmod-aarch64" >> "$GITHUB_ENV"
+        elif [ "${{ matrix.model }}" = "x86_64" ]; then
+          echo "kmod_repo=kmod-x86_64" >> "$GITHUB_ENV"
+        elif [ "${{ matrix.model }}" = "netgear_r8500" ]; then
+          echo "kmod_repo=kmod-bcm53xx" >> "$GITHUB_ENV"
+        elif [ "${{ matrix.model }}" = "armv8" ]; then
+          echo "kmod_repo=kmod-armsr-armv8" >> "$GITHUB_ENV"
+        fi
+
+    - name: Show system
+      run: |
+        echo -e "\n\e[1;32mCPU:\e[0m"
+        echo "$(grep 'model name' /proc/cpuinfo | head -1 | awk -F ': ' '{print $2}') ($(grep 'cpu MHz' /proc/cpuinfo | head -1 | awk -F ': ' '{print $2}')MHz) x $(grep processor /proc/cpuinfo  | wc -l)"
+        echo -e "\n\e[1;32mMemory:\e[0m"
+        free -h
+        echo -e "\n\e[1;32mStorage:\e[0m"
+        df -Th / /mnt
+        echo -e "\n\e[1;32mSystem:\e[0m"
+        lsb_release -a
+        echo -e "\n\e[1;32mKernel:\e[0m"
+        uname -a
+        echo
+
+    - name: Free disk space
+      uses: sbwml/actions@free-disk
+      with:
+        build-mount-path: /builder
+
+    - name: Build System Setup
+      uses: sbwml/actions@openwrt-build-setup
+
+    - name: Install LLVM
+      uses: sbwml/actions@install-llvm
+
+    - name: Restore Cached
+      if: ${{ matrix.model != 'armv8' && matrix.model != 'nanopi-r4s' }}
+      uses: actions/cache/restore@v4
+      with:
+        path: /builder/.ccache
+        key: ${{ matrix.tag.version }}-${{ matrix.model }}
+
+    - name: Restore Cached (releases)
+      if: ${{ matrix.model == 'armv8' || matrix.model == 'nanopi-r4s' }}
+      continue-on-error: true
+      working-directory: /builder
+      run: |
+        wget -q https://github.com/${{ github.repository }}/releases/download/ccache/${{ matrix.model }}.tar.00 || true
+        wget -q https://github.com/${{ github.repository }}/releases/download/ccache/${{ matrix.model }}.tar.01 || true
+        cat ${{ matrix.model }}.tar.* | tar -xf - || true
+        rm -rf ${{ matrix.model }}.tar.* || true
+        cache_size=$(du -sb .ccache | awk '{print $1}')
+        cache_size_mb=$(echo "scale=0; ${cache_size} / (1024 * 1024)" | bc)
+        echo "Cache Size: ~${cache_size_mb} MB (${cache_size} B)"
+        echo "Cache restored successfully"
+        echo "Cache restored from key: ${{ matrix.model }}"
+
+    - name: Compile OpenWrt
+      id: compile
+      continue-on-error: true
+      working-directory: /builder
+      env:
+        git_password: ${{ secrets.ftp_password }}
+        private_url: ${{ secrets.private_url }}
+      run: |
+        [ "${{ matrix.model }}" != "netgear_r8500" ] && export KERNEL_CLANG_LTO=y
+        export BUILD_FAST=y ENABLE_CCACHE=y ENABLE_OTA=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y USE_GCC15=y ENABLE_MOLD=y
+        bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
+        cd openwrt
+        tags=$(git describe --abbrev=0 --tags)
+        echo "latest_release=$tags" >>$GITHUB_ENV
+
+    - name: Extensive logs after a failed compilation
+      if: steps.compile.outcome == 'failure'
+      working-directory: /builder
+      run: |
+        cd openwrt
+        make V=s IGNORE_ERRORS="n m"
+
+    - name: Prepare Firmware Files
+      working-directory: /builder
+      run: |
+        mkdir -p rom info
+        if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
+          cp -a openwrt/bin/targets/rockchip/*/*.img.gz rom/
+          cp -a openwrt/bin/targets/rockchip/*/*-r4s.manifest info/manifest.txt
+          cp -a openwrt/bin/targets/rockchip/*/config.buildinfo info/config.buildinfo
+          cd rom && sha256sum * > ../info/sha256sums.txt
+        elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
+          cp -a openwrt/bin/targets/rockchip/*/*.img.gz rom/
+          cp -a openwrt/bin/targets/rockchip/*/*.manifest info/manifest.txt
+          cp -a openwrt/bin/targets/rockchip/*/config.buildinfo info/config.buildinfo
+          cd rom && sha256sum * > ../info/sha256sums.txt
+        elif [ "${{ matrix.model }}" = "x86_64" ]; then
+          cp -a openwrt/bin/targets/x86/*/*-ext4-combined-efi.img.gz rom/
+          cp -a openwrt/bin/targets/x86/*/*-squashfs-combined-efi.img.gz rom/
+          cp -a openwrt/bin/targets/x86/*/*-generic-rootfs.tar.gz rom/
+          cp -a openwrt/bin/targets/x86/*/*-x86-64-generic.manifest info/manifest.txt
+          cp -a openwrt/bin/targets/x86/*/config.buildinfo info/config.buildinfo
+          cd rom && sha256sum * > ../info/sha256sums.txt
+        elif [ "${{ matrix.model }}" = "netgear_r8500" ]; then
+          cp -a openwrt/bin/targets/bcm53xx/generic/*-bcm53xx-generic-netgear_r8500-squashfs.chk rom/
+          cp -a openwrt/bin/targets/bcm53xx/generic/*.manifest info/manifest.txt
+          cp -a openwrt/bin/targets/bcm53xx/generic/config.buildinfo info/config.buildinfo
+          cd rom && sha256sum * > ../info/sha256sums.txt
+        elif [ "${{ matrix.model }}" = "armv8" ]; then
+          tar zcf rom/u-boot-qemu_armv8.tar.gz -C openwrt/bin/targets/armsr/armv8*/ ./u-boot-qemu_armv8
+          cp -a openwrt/bin/targets/armsr/armv8*/*-generic-initramfs-kernel.bin rom/
+          cp -a openwrt/bin/targets/armsr/armv8*/*-generic-kernel.bin rom/
+          cp -a openwrt/bin/targets/armsr/armv8*/*-generic-ext4-combined-efi.img.gz rom/
+          cp -a openwrt/bin/targets/armsr/armv8*/*-generic-squashfs-combined-efi.img.gz rom/
+          cp -a openwrt/bin/targets/armsr/armv8*/*-rootfs.tar.gz rom/
+          cp -a openwrt/bin/targets/armsr/armv8*/*.manifest info/manifest.txt
+          cp -a openwrt/bin/targets/armsr/armv8*/config.buildinfo info/config.buildinfo
+          cd rom && sha256sum * > ../info/sha256sums.txt
+        fi
+        cd ..
+        tar zcf rom/buildinfo_${{ matrix.model }}.tar.gz info
+
+    - name: Create virtual machine images
+      if: ${{ matrix.model == 'x86_64' }}
+      working-directory: /builder
+      run: |
+        mkdir -p virtual_images
+        cp -a openwrt/bin/targets/x86/*/*-generic-squashfs-combined-efi.img.gz virtual_images/
+        gzip -dq virtual_images/*-generic-squashfs-combined-efi.img.gz || true
+        cd virtual_images
+        image_name=$(basename -s .img *.img)
+        qemu-img convert -f raw -O qcow2 *.img $image_name.qcow2
+        qemu-img convert -f raw -O vpc *.img $image_name.vhd
+        qemu-img convert -f raw -O vmdk *.img $image_name.vmdk
+        rm -f *.img
+        sha256sum * > sha256sums.txt
+        echo "<center><h1>x86_64 虚拟机平台镜像</h1></center>" > README.md
+
+    - name: Create release
+      uses: ncipollo/release-action@v1.14.0
+      with:
+        name: OpenWrt-${{ env.latest_release }}
+        allowUpdates: true
+        tag: ${{ env.latest_release }}
+        commit: main
+        replacesArtifacts: true
+        token: ${{ secrets.workflow_token }}
+        artifacts: |
+          ${{ env.build_dir }}/rom/*
+
+    - name: Release kernel modules
+      if: ${{ matrix.model != 'nanopi-r4s' }}
+      uses: ncipollo/release-action@v1.14.0
+      with:
+        name: OpenWrt-${{ env.latest_release }}
+        allowUpdates: true
+        tag: ${{ env.latest_release }}
+        commit: main
+        replacesArtifacts: true
+        token: ${{ secrets.workflow_token }}
+        artifacts: |
+          ${{ env.build_dir }}/openwrt/*-*.tar.gz
+
+    - name: Sync kernel modules
+      if: env.release_kmod == 'true'
+      uses: peter-evans/repository-dispatch@v3
+      with:
+        token: ${{ secrets.workflow_token }}
+        repository: sbwml/${{ env.kmod_repo }}
+        event-type: sync
+
+    - name: Install aliyunpan & login
+      if: ${{ matrix.model != 'armv8' }}
+      continue-on-error: true
+      working-directory: /builder
+      timeout-minutes: 1
+      run: |
+        if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
+          device_id=${{ secrets.device_id_r4s }}
+        elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
+          device_id=${{ secrets.device_id_r5s }}
+        elif [ "${{ matrix.model }}" = "x86_64" ]; then
+          device_id=${{ secrets.device_id_x86 }}
+        elif [ "${{ matrix.model }}" = "netgear_r8500" ]; then
+          device_id=${{ secrets.device_id_netgear }}
+        fi
+        sudo wget -q ${{ secrets.aliyunpan_go }} -O /bin/aliyunpan
+        sudo chmod 0755 /bin/aliyunpan
+        sudo sh -c 'echo "${{ secrets.aliyunpan_us_node }} api.alipan.com auth.alipan.com www.alipan.com" >> /etc/hosts'
+        export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
+        aliyun_token=`curl -s ${{ secrets.aliyun_token }} | openssl enc -aes-256-cfb -pbkdf2 -a -d -k ${{ secrets.token_dec }}`
+        aliyunpan config set -device_id=$device_id >/dev/null 2>&1
+        echo
+        echo $aliyun_token | aliyunpan login
+
+    - name: Upload Firmware - releases
+      if: ${{ matrix.model != 'armv8' }}
+      id: upload
+      continue-on-error: true
+      working-directory: /builder
+      timeout-minutes: 40
+      run: |
+        export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
+        version=$(cat openwrt/version.txt)
+        if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
+          aliyunpan upload --timeout 20 --retry 10 --ow info/config.buildinfo openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 20 --retry 10 --ow info/manifest.txt openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 20 --retry 10 --ow info/sha256sums.txt openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 20 --retry 10 --ow rom/*-r4s-ext4-sysupgrade.img.gz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 20 --retry 10 --ow rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
+        elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
+          aliyunpan upload --timeout 20 --retry 10 --ow info/config.buildinfo openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 20 --retry 10 --ow info/manifest.txt openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 20 --retry 10 --ow info/sha256sums.txt openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 20 --retry 10 --ow rom/*-r5c-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 20 --retry 10 --ow rom/*-r5c-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 20 --retry 10 --ow rom/*-r5s-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 20 --retry 10 --ow rom/*-r5s-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
+        elif [ "${{ matrix.model }}" = "x86_64" ]; then
+          aliyunpan upload --timeout 30 --retry 10 --ow info/config.buildinfo openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 30 --retry 10 --ow info/manifest.txt openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 30 --retry 10 --ow info/sha256sums.txt openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 30 --retry 10 --ow rom/*-generic-rootfs.tar.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 30 --retry 10 --ow rom/*-ext4-combined-efi.img.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 30 --retry 10 --ow rom/*-squashfs-combined-efi.img.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
+          # virtual machine images
+          aliyunpan upload --timeout 30 --retry 10 --ow virtual_images/README.md openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/virtual_machine_images/
+          aliyunpan upload --timeout 30 --retry 10 --ow virtual_images/sha256sums.txt openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/virtual_machine_images/
+          aliyunpan upload --timeout 30 --retry 10 --ow virtual_images/*.vmdk openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/virtual_machine_images/
+          aliyunpan upload --timeout 30 --retry 10 --ow virtual_images/*.vhd openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/virtual_machine_images/
+          aliyunpan upload --timeout 30 --retry 10 --ow virtual_images/*.qcow2 openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/virtual_machine_images/
+        elif [ "${{ matrix.model }}" = "netgear_r8500" ]; then
+          aliyunpan upload --timeout 20 --retry 10 --ow info/config.buildinfo openwrt/netgear-r8500/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 20 --retry 10 --ow info/manifest.txt openwrt/netgear-r8500/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 20 --retry 10 --ow info/sha256sums.txt openwrt/netgear-r8500/releases/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 20 --retry 10 --ow rom/*.chk openwrt/netgear-r8500/releases/${{ matrix.tag.version }}/$version/
+        fi
+        aliyunpan recycle delete -all
+        echo y | aliyunpan logout
+
+    - name: Retry Upload Firmware - releases
+      if: steps.upload.outcome == 'failure'
+      run: |
+        sshpass -p ${{ secrets.user_password }} ssh -o StrictHostKeyChecking=no root@${{ secrets.ftp_address }} >/dev/null 2>&1
+        sshpass -p ${{ secrets.user_password }} ssh root@${{ secrets.ftp_address }} "/opt/sbin/fw-upload ${{ matrix.model }}"
+
+    - name: Release OTA
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        username: openwrt
+        server: ${{ secrets.ftp_address }}
+        password: ${{ secrets.ftp_password }}
+        server-dir: release/${{ matrix.model }}/
+        local-dir: ${{ env.build_dir }}/openwrt/ota/
+        dangerous-clean-slate: true
