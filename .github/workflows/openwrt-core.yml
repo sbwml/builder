@@ -102,7 +102,6 @@ jobs:
         event-type: sync
 
     - name: Delete Cached
-      if: ${{ matrix.model != 'armv8' }}
       continue-on-error: true
       working-directory: /builder
       env:
@@ -112,31 +111,7 @@ jobs:
         gh cache delete ${{ matrix.tag.version }}-${{ matrix.model }} || true
 
     - name: Save Cached
-      if: ${{ matrix.model != 'armv8' }}
       uses: actions/cache/save@v4
       with:
         path: /builder/.ccache
         key: ${{ matrix.tag.version }}-${{ matrix.model }}
-
-    - name: Create Ccache tar files
-      if: ${{ matrix.model == 'armv8' }}
-      continue-on-error: true
-      working-directory: /builder
-      run: |
-        mkdir -p ccache
-        tar cf - .ccache | split -d -b 1800m - ccache/${{ matrix.model }}.tar.
-
-    - name: Save Cached (releases)
-      if: ${{ matrix.model == 'armv8' }}
-      continue-on-error: true
-      uses: ncipollo/release-action@v1.14.0
-      with:
-        name: ccache
-        allowUpdates: true
-        tag: ccache
-        commit: main
-        replacesArtifacts: true
-        prerelease: true
-        token: ${{ secrets.workflow_token }}
-        artifacts: |
-          ${{ env.build_dir }}/ccache/*

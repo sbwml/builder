@@ -59,25 +59,10 @@ jobs:
       uses: sbwml/actions@install-llvm
 
     - name: Restore Cached
-      if: ${{ matrix.model != 'armv8' }}
       uses: actions/cache/restore@v4
       with:
         path: /builder/.ccache
         key: ${{ matrix.tag.version }}-${{ matrix.model }}
-
-    - name: Restore Cached (releases)
-      if: ${{ matrix.model == 'armv8' }}
-      continue-on-error: true
-      working-directory: /builder
-      run: |
-        curl -s https://api.github.com/repos/${{ github.repository }}/releases | grep 'browser_download_url' | grep ccache | grep ${{ matrix.model }} | awk -F '"' '{print $4}' | grep -v '^$' | xargs -n 1 wget -q || true
-        cat ${{ matrix.model }}.tar.* | tar -xf - || true
-        rm -rf ${{ matrix.model }}.tar.* || true
-        [ -d .ccache ] && cache_size=$(du -sb .ccache | awk '{print $1}') || cache_size=0
-        cache_size_mb=$(echo "scale=0; ${cache_size} / (1024 * 1024)" | bc)
-        echo "Cache Size: ~${cache_size_mb} MB (${cache_size} B)"
-        echo "Cache restored successfully"
-        echo "Cache restored from key: ${{ matrix.model }}"
 
     - name: Compile OpenWrt
       id: compile
@@ -103,7 +88,6 @@ jobs:
         make V=s IGNORE_ERRORS="n m"
 
     - name: Delete Cached
-      if: ${{ matrix.model != 'armv8' }}
       continue-on-error: true
       working-directory: /builder
       env:
@@ -113,34 +97,10 @@ jobs:
         gh cache delete ${{ matrix.tag.version }}-${{ matrix.model }} || true
 
     - name: Save Cached
-      if: ${{ matrix.model != 'armv8' }}
       uses: actions/cache/save@v4
       with:
         path: /builder/.ccache
         key: ${{ matrix.tag.version }}-${{ matrix.model }}
-
-    - name: Create Ccache tar files
-      if: ${{ matrix.model == 'armv8' }}
-      continue-on-error: true
-      working-directory: /builder
-      run: |
-        mkdir -p ccache
-        tar cf - .ccache | split -d -b 1800m - ccache/${{ matrix.model }}.tar.
-
-    - name: Save Cached (releases)
-      if: ${{ matrix.model == 'armv8' }}
-      continue-on-error: true
-      uses: ncipollo/release-action@v1.14.0
-      with:
-        name: ccache
-        allowUpdates: true
-        tag: ccache
-        commit: main
-        replacesArtifacts: true
-        prerelease: true
-        token: ${{ secrets.workflow_token }}
-        artifacts: |
-          ${{ env.build_dir }}/ccache/*
 
     - name: Prepare Firmware Files
       working-directory: /builder
