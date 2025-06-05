@@ -157,7 +157,7 @@ jobs:
     - name: Upload Firmware - snapshots
       if: ${{ matrix.model != 'armv8' && env.current_hour >= '0' && env.current_hour <= '10' }}
       working-directory: /builder
-      timeout-minutes: 20
+      timeout-minutes: 30
       continue-on-error: true
       run: |
         export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
