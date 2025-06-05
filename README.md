@@ -2,7 +2,7 @@
   <img width="400px" src="https://github.com/user-attachments/assets/6d37cd69-a232-4444-9f91-30e5942a8938" />
 </p>
 
-<h1 align="center">OpenWrt for FriendlyElec NanoPi R4S / R5S & X86_64 & Netgear R8500</h1>
+<h1 align="center">OpenWrt for FriendlyElec NanoPi R4S / R5S & X86_64</h1>
 
 <p align="center">
   <img width="300px" src="https://cdn.cooluc.com/r4s/r5s_.webp" />
@@ -167,7 +167,7 @@
 　├── 网速测试<br/>
 　├── SQM 队列管理<br/>
 　├── 防火墙<br/>
-　├── UPnP<br/>
+　├── UPnP IGD 和 PCP<br/>
 　├── 带宽监控<br/>
 　├── 应用过滤<br/>
 　├── Socat<br/>

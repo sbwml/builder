@@ -242,8 +242,8 @@ jobs:
     - name: Retry Upload Firmware - releases
       if: steps.upload.outcome == 'failure'
       run: |
-        sshpass -p ${{ secrets.user_password }} ssh -o StrictHostKeyChecking=no root@${{ secrets.ftp_address }} >/dev/null 2>&1
-        sshpass -p ${{ secrets.user_password }} ssh root@${{ secrets.ftp_address }} "/opt/sbin/fw-upload ${{ matrix.model }}"
+        sshpass -p ${{ secrets.user_password }} ssh -o StrictHostKeyChecking=no root@${{ secrets.guangzhou_address }} >/dev/null 2>&1
+        sshpass -p ${{ secrets.user_password }} ssh root@${{ secrets.guangzhou_address }} "/opt/sbin/fw-upload ${{ matrix.model }}"
 
     - name: Release OTA
       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
