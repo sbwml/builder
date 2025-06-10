@@ -21,6 +21,7 @@ jobs:
           - nanopi-r5s
           - x86_64
           - netgear_r8500
+          - redmi_ax6000
         tag:
           - type: rc2
             version: openwrt-24.10
@@ -138,6 +139,12 @@ jobs:
           cp -a openwrt/bin/targets/armsr/armv8*/*.manifest info/manifest.txt
           cp -a openwrt/bin/targets/armsr/armv8*/config.buildinfo info/config.buildinfo
           cd rom && sha256sum * > ../info/sha256sums.txt
+        elif [ "${{ matrix.model }}" = "xiaomi_ax6000" ]; then
+          cp -a openwrt/bin/targets/qualcommax/ipq50xx*/*xiaomi_ax6000-initramfs-factory.ubi rom/
+          cp -a openwrt/bin/targets/qualcommax/ipq50xx*/*xiaomi_ax6000-squashfs-sysupgrade.bin rom/
+          cp -a openwrt/bin/targets/qualcommax/ipq50xx*/*.manifest info/manifest.txt
+          cp -a openwrt/bin/targets/qualcommax/ipq50xx*/config.buildinfo info/config.buildinfo
+          cd rom && sha256sum * > ../info/sha256sums.txt
         fi
         cd ..
         tar zcf rom/buildinfo_${{ matrix.model }}.tar.gz info
@@ -171,7 +178,7 @@ jobs:
           ${{ env.build_dir }}/rom/*
 
     - name: Install aliyunpan & login
-      if: ${{ matrix.model != 'armv8' }}
+      if: ${{ matrix.model != 'armv8' && matrix.model != 'xiaomi_ax6000' }}
       continue-on-error: true
       working-directory: /builder
       timeout-minutes: 1
@@ -195,7 +202,7 @@ jobs:
         echo $aliyun_token | aliyunpan login
 
     - name: Upload Firmware - releases
-      if: ${{ matrix.model != 'armv8' }}
+      if: ${{ matrix.model != 'armv8' && matrix.model != 'xiaomi_ax6000' }}
       id: upload
       continue-on-error: true
       working-directory: /builder
