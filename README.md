@@ -2,7 +2,7 @@
   <img width="400px" src="https://github.com/user-attachments/assets/6d37cd69-a232-4444-9f91-30e5942a8938" />
 </p>
 
-<h1 align="center">OpenWrt for FriendlyElec NanoPi R4S / R5S & X86_64</h1>
+<h1 align="center">OpenWrt for FriendlyElec NanoPi R4S / R5S / R76S & X86_64</h1>
 
 <p align="center">
   <img width="300px" src="https://cdn.cooluc.com/r4s/r5s_.webp" />
@@ -19,6 +19,8 @@
 **NanoPi R4S: https://r4s.cooluc.com**
 
 **NanoPi R5S: https://r5s.cooluc.com**
+
+**NanoPi R76S: https://r76s.cooluc.com**
 
 **X86_64: https://x86.cooluc.com**
 

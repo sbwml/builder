@@ -18,6 +18,7 @@ jobs:
         model:
           - nanopi-r4s
           - nanopi-r5s
+          - nanopi-r76s
           - x86_64
           - netgear_r8500
         tag:
@@ -31,6 +32,11 @@ jobs:
         git config --global user.name 'actions'
         git config --global user.email 'action@github.com'
         echo build_dir="/builder" >> "$GITHUB_ENV"
+        if [[ "${{ matrix.model }}" == nanopi-* ]]; then
+          echo ccache_model=nanopi-r5s >> "$GITHUB_ENV"
+        else
+          echo ccache_model=${{ matrix.model }} >> "$GITHUB_ENV"
+        fi
 
     - name: Show system
       run: |
@@ -61,7 +67,7 @@ jobs:
       uses: actions/cache/restore@v4
       with:
         path: /builder/.ccache
-        key: ${{ matrix.tag.version }}-${{ matrix.model }}
+        key: ${{ matrix.tag.version }}-${{ env.ccache_model }}"
 
     - name: Compile OpenWrt
       id: compile
@@ -99,6 +105,11 @@ jobs:
           cp -a openwrt/bin/targets/rockchip/*/*.manifest info/manifest.txt
           cp -a openwrt/bin/targets/rockchip/*/config.buildinfo info/config.buildinfo
           cd rom && sha256sum * > ../info/sha256sums.txt
+        elif [ "${{ matrix.model }}" = "nanopi-r76s" ]; then
+          cp -a openwrt/bin/targets/rockchip/*/*.img.gz rom/
+          cp -a openwrt/bin/targets/rockchip/*/*.manifest info/manifest.txt
+          cp -a openwrt/bin/targets/rockchip/*/config.buildinfo info/config.buildinfo
+          cd rom && sha256sum * > ../info/sha256sums.txt
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
           cp -a openwrt/bin/targets/x86/*/*-ext4-combined-efi.img.gz rom/
           cp -a openwrt/bin/targets/x86/*/*-squashfs-combined-efi.img.gz rom/
@@ -123,6 +134,8 @@ jobs:
           device_id=${{ secrets.device_id_r4s_minimal }}
         elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
           device_id=${{ secrets.device_id_r5s_minimal }}
+        elif [ "${{ matrix.model }}" = "nanopi-r76s" ]; then
+          device_id=${{ secrets.device_id_r76s_minimal }}
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
           device_id=${{ secrets.device_id_x86_minimal }}
         elif [ "${{ matrix.model }}" = "netgear_r8500" ]; then
@@ -163,6 +176,12 @@ jobs:
           aliyunpan upload --timeout 30 --retry 10 --ow rom/*-r5c-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/minimal/${{ matrix.tag.version }}/$version/
           aliyunpan upload --timeout 30 --retry 10 --ow rom/*-r5s-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/minimal/${{ matrix.tag.version }}/$version/
           aliyunpan upload --timeout 30 --retry 10 --ow rom/*-r5s-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/minimal/${{ matrix.tag.version }}/$version/
+        elif [ "${{ matrix.model }}" = "nanopi-r76s" ]; then
+          aliyunpan upload --timeout 30 --retry 10 --ow info/config.buildinfo openwrt/nanopi-r76s/minimal/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 30 --retry 10 --ow info/manifest.txt openwrt/nanopi-r76s/minimal/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 30 --retry 10 --ow info/sha256sums.txt openwrt/nanopi-r76s/minimal/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 30 --retry 10 --ow rom/*-r76s-ext4-sysupgrade.img.gz openwrt/nanopi-r76s/minimal/${{ matrix.tag.version }}/$version/
+          aliyunpan upload --timeout 30 --retry 10 --ow rom/*-r76s-squashfs-sysupgrade.img.gz openwrt/nanopi-r76s/minimal/${{ matrix.tag.version }}/$version/
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
           aliyunpan upload --timeout 30 --retry 10 --ow info/config.buildinfo openwrt/x86_64/minimal/${{ matrix.tag.version }}/$version/
           aliyunpan upload --timeout 30 --retry 10 --ow info/manifest.txt openwrt/x86_64/minimal/${{ matrix.tag.version }}/$version/
