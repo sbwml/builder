@@ -93,23 +93,6 @@ jobs:
         cd openwrt
         make V=s IGNORE_ERRORS="n m"
 
-    - name: Delete Cached
-      if: ${{ matrix.model != 'nanopi-r4s' && matrix.model != 'nanopi-r76s' }}
-      continue-on-error: true
-      working-directory: /builder
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GH_REPO: ${{ github.repository }}
-      run: |
-        gh cache delete ${{ matrix.tag.version }}-${{ env.ccache_model }} || true
-
-    - name: Save Cached
-      if: ${{ matrix.model != 'nanopi-r4s' && matrix.model != 'nanopi-r76s' }}
-      uses: actions/cache/save@v4
-      with:
-        path: /builder/.ccache
-        key: ${{ matrix.tag.version }}-${{ env.ccache_model }}"
-
     - name: Prepare Firmware Files
       working-directory: /builder
       run: |
