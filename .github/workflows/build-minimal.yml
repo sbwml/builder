@@ -76,6 +76,7 @@ jobs:
       env:
         git_name: private
         git_password: ${{ secrets.ftp_password }}
+        private_url: ${{ secrets.private_url }}
       run: |
         [ "${{ matrix.model }}" != "netgear_r8500" ] && export KERNEL_CLANG_LTO=y
         export BUILD_FAST=y ENABLE_CCACHE=y ENABLE_OTA=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y MINIMAL_BUILD=y USE_GCC15=y ENABLE_MOLD=y
