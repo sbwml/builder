@@ -17,7 +17,6 @@ jobs:
           - armv8
           - nanopi-r5s
           - x86_64
-          - netgear_r8500
         tag:
           - type: rc2
             version: openwrt-24.10
@@ -63,8 +62,7 @@ jobs:
         git_name: private
         git_password: ${{ secrets.ftp_password }}
       run: |
-        [ "${{ matrix.model }}" != "netgear_r8500" ] && export KERNEL_CLANG_LTO=y ENABLE_DPDK=y
-        export BUILD_FAST=y ENABLE_CCACHE=y ENABLE_OTA=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y USE_GCC15=y ENABLE_MOLD=y MINIMAL_BUILD=y OPENWRT_CORE=y
+        export KERNEL_CLANG_LTO=y ENABLE_DPDK=y BUILD_FAST=y ENABLE_CCACHE=y ENABLE_OTA=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y USE_GCC15=y ENABLE_MOLD=y MINIMAL_BUILD=y OPENWRT_CORE=y
         bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
 
     - name: Extensive logs after a failed compilation

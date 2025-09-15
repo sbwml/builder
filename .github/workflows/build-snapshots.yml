@@ -21,7 +21,6 @@ jobs:
           - nanopi-r5s
           - nanopi-r76s
           - x86_64
-          - netgear_r8500
         tag:
           - type: dev
             version: openwrt-24.10
@@ -79,8 +78,7 @@ jobs:
         git_password: ${{ secrets.ftp_password }}
         private_url: ${{ secrets.private_url }}
       run: |
-        [ "${{ matrix.model }}" != "netgear_r8500" ] && export KERNEL_CLANG_LTO=y
-        export BUILD_FAST=y ENABLE_CCACHE=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y USE_GCC15=y ENABLE_MOLD=y MINIMAL_BUILD=y
+        export KERNEL_CLANG_LTO=y BUILD_FAST=y ENABLE_CCACHE=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y USE_GCC15=y ENABLE_MOLD=y MINIMAL_BUILD=y
         bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
         build_date=$(date "+%Y-%m-%d")
         echo "build_date=$build_date" >> $GITHUB_ENV
@@ -118,11 +116,6 @@ jobs:
           cp -a openwrt/bin/targets/x86/*/*-x86-64-generic.manifest info/manifest.txt
           cp -a openwrt/bin/targets/x86/*/config.buildinfo info/config.buildinfo
           cd rom && sha256sum *gz > ../info/sha256sums.txt
-        elif [ "${{ matrix.model }}" = "netgear_r8500" ]; then
-          cp -a openwrt/bin/targets/bcm53xx/generic/*-bcm53xx-generic-netgear_r8500-squashfs.chk rom/
-          cp -a openwrt/bin/targets/bcm53xx/generic/*.manifest info/manifest.txt
-          cp -a openwrt/bin/targets/bcm53xx/generic/config.buildinfo info/config.buildinfo
-          cd rom && sha256sum * > ../info/sha256sums.txt
         elif [ "${{ matrix.model }}" = "armv8" ]; then
           tar zcf rom/u-boot-qemu_armv8.tar.gz -C openwrt/bin/targets/armsr/armv8*/ ./u-boot-qemu_armv8
           cp -a openwrt/bin/targets/armsr/armv8*/*-generic-initramfs-kernel.bin rom/
@@ -155,8 +148,6 @@ jobs:
           device_id=${{ secrets.device_id_r76s_dev }}
         elif [ "${{ matrix.model }}" = "x86_64" ]; then
           device_id=${{ secrets.device_id_x86_dev }}
-        elif [ "${{ matrix.model }}" = "netgear_r8500" ]; then
-          device_id=${{ secrets.device_id_netgear_dev }}
         fi
         sudo wget -q ${{ secrets.aliyunpan_go }} -O /bin/aliyunpan
         sudo chmod 0755 /bin/aliyunpan
@@ -203,11 +194,6 @@ jobs:
           aliyunpan upload --timeout 30 --retry 10 --ow rom/*-generic-rootfs.tar.gz openwrt/x86_64/snapshots/$branch/$DATE/
           aliyunpan upload --timeout 30 --retry 10 --ow rom/*-ext4-combined-efi.img.gz openwrt/x86_64/snapshots/$branch/$DATE/
           aliyunpan upload --timeout 30 --retry 10 --ow rom/*-squashfs-combined-efi.img.gz openwrt/x86_64/snapshots/$branch/$DATE/
-        elif [ "${{ matrix.model }}" = "netgear_r8500" ]; then
-          aliyunpan upload --timeout 30 --retry 10 --ow info/config.buildinfo openwrt/netgear-r8500/snapshots/$branch/$DATE/
-          aliyunpan upload --timeout 30 --retry 10 --ow info/manifest.txt openwrt/netgear-r8500/snapshots/$branch/$DATE/
-          aliyunpan upload --timeout 30 --retry 10 --ow info/sha256sums.txt openwrt/netgear-r8500/snapshots/$branch/$DATE/
-          aliyunpan upload --timeout 30 --retry 10 --ow rom/*.chk openwrt/netgear-r8500/snapshots/$branch/$DATE/
         fi
         aliyunpan recycle delete -all
         echo y | aliyunpan logout

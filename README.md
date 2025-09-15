@@ -24,8 +24,6 @@
 
 **X86_64: https://x86.cooluc.com**
 
-**Netgear R8500: https://r8500.cooluc.com**
-
 **24.10-SNAPSHOT: https://snapshot.cooluc.com**
 
 ## 版本信息
@@ -119,7 +117,7 @@
 　├── 在线升级<br/>
 　├── 备份/升级<br/>
 　├── 自定义命令<br/>
-　├── 文件管理器<br/>
+　├── 文件管理<br/>
 　├── 定时重启<br/>
 　├── 主题设置<br/>
 　├── CPU 性能调节<br/>
@@ -132,12 +130,13 @@
 　├── qBittorrent<br/>
 　├── MosDNS<br/>
 　├── 动态 DNS<br/>
-　├── Watchcat<br/>
 　├── KMS 服务器<br/>
+　├── Watchcat<br/>
 　├── 隔空播放<br/>
 　├── AirPlay 2<br/>
+　├── 应用过滤<br/>
 　├── Aria2<br/>
-　├── FRP 客户端<br/>
+　├── Frp 客户端<br/>
 　├── 锐捷认证<br/>
 　├── NATMap<br/>
 　├── 网络共享<br/>
@@ -156,7 +155,6 @@
 </details>
 <details>
 <summary><b>├── 网络存储</b></summary>
-　├── Alist 文件列表<br/>
 　├── USB 打印服务器<br/>
 　└── WebDav
 </details>
@@ -171,7 +169,6 @@
 　├── 防火墙<br/>
 　├── UPnP IGD 和 PCP<br/>
 　├── 带宽监控<br/>
-　├── 应用过滤<br/>
 　├── Socat<br/>
 　└── 网速控制
 </details>
