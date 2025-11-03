@@ -98,18 +98,3 @@ jobs:
         token: ${{ secrets.workflow_token }}
         repository: sbwml/openwrt_core_dev
         event-type: sync
-
-    - name: Delete Cached
-      continue-on-error: true
-      working-directory: /builder
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GH_REPO: ${{ github.repository }}
-      run: |
-        gh cache delete ${{ matrix.tag.version }}-${{ matrix.model }} || true
-
-    - name: Save Cached
-      uses: actions/cache/save@v4
-      with:
-        path: /builder/.ccache
-        key: ${{ matrix.tag.version }}-${{ matrix.model }}
