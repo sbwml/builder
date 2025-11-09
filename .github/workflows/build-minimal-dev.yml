@@ -1,4 +1,4 @@
-name: Build releases dev
+name: Build minimal dev
 
 on:
   workflow_dispatch:
@@ -70,7 +70,7 @@ jobs:
         git_password: ${{ secrets.ftp_password }}
         private_url: ${{ secrets.private_url }}
       run: |
-        export KERNEL_CLANG_LTO=y BUILD_FAST=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y USE_GCC15=y ENABLE_MOLD=y
+        export KERNEL_CLANG_LTO=y BUILD_FAST=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y USE_GCC15=y ENABLE_MOLD=y MINIMAL_BUILD=y
         bash <(curl -sS https://init3.cooluc.com/build.sh) ${{ matrix.tag.type }} ${{ matrix.model }}
         cd openwrt
         tags=$(git describe --abbrev=0 --tags)
@@ -130,5 +130,5 @@ jobs:
         username: dev
         server: ${{ secrets.ftp_address }}
         password: ${{ secrets.ftp_password }}
-        server-dir: release/${{ matrix.model }}/
+        server-dir: minimal/${{ matrix.model }}/
         local-dir: ${{ env.build_dir }}/rom/
