@@ -26,13 +26,15 @@
 
 **24.10-SNAPSHOT: https://snapshot.cooluc.com**
 
+**备用下载: https://dev.cooluc.com**
+
 ## 版本信息
 
-**[Releases](https://r5s.cooluc.com/releases)：正式版 - 基于 [OpenWrt](https://github.com/openwrt/openwrt/releases) 最新 Releases 源代码和软件包编译（推荐） - [Linux 6.12 LTS](https://kernel.org/)**
+**[Releases](https://r5s.cooluc.com/releases)：正式版 - 基于 [OpenWrt](https://github.com/openwrt/openwrt/releases) 最新 Releases 源代码和软件包编译（推荐） - [Linux 6.18 LTS](https://kernel.org/)**
 
-**[Snapshots](https://r5s.cooluc.com/snapshots)：开发版 - 基于 [OpenWrt](https://github.com/openwrt/openwrt/tree/openwrt-24.10) 最新 openwrt-24.10 分支源代码和软件包编译 - [Linux 6.12 LTS](https://kernel.org/)（每夜构建）**
+**[Snapshots](https://r5s.cooluc.com/snapshots)：开发版 - 基于 [OpenWrt](https://github.com/openwrt/openwrt/tree/openwrt-24.10) 最新 openwrt-24.10 分支源代码和软件包编译 - [Linux 6.18 LTS](https://kernel.org/)（每夜构建）**
 
-**[Minimal](https://r5s.cooluc.com/minimal)：轻量版 - 基于 [OpenWrt](https://github.com/openwrt/openwrt/releases) 最新 Releases 源代码和软件包编译，无内置插件（不推荐） - [Linux 6.12 LTS](https://kernel.org/)**
+**[Minimal](https://r5s.cooluc.com/minimal)：轻量版 - 基于 [OpenWrt](https://github.com/openwrt/openwrt/releases) 最新 Releases 源代码和软件包编译，无内置插件（不推荐） - [Linux 6.18 LTS](https://kernel.org/)**
 
 ------
 
@@ -61,7 +63,7 @@
 
 | 内置插件                 | 状态 | 内置插件         | 状态 |
 |:------------------------:|:----:|:----------------:|:----:|
-| PassWall                 | ✅   | Docker           | ✅   |
+| PassWall                 | ✅   | Docker（nftables）| ✅   |
 | HomeProxy                | ✅   | TTY 终端         | ✅   |
 | FileBrowser              | ✅   | NetData 监控     | ✅   |
 | qBittorrent              | ✅   | DiskMan 磁盘管理 | ✅   |
@@ -79,6 +81,7 @@
 | 隔空播放（AirConnect）   | ✅   | WebDav           | ✅   |
 | 自定义命令               | ✅   | AirPlay 2        | ✅   |
 | 网速测试                 | ✅   | NATMap           | ✅   |
+| rtp2httpd                | ✅   |                  |      |
 
 ✅ 可用
 
@@ -139,6 +142,8 @@
 　├── Frp 客户端<br/>
 　├── 锐捷认证<br/>
 　├── NATMap<br/>
+　├── OpenList<br/>
+　├── rtp2httpd<br/>
 　├── 网络共享<br/>
 　├── 网络唤醒<br/>
 　└── ZeroTier

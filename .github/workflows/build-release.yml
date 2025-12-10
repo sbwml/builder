@@ -159,6 +159,33 @@ jobs:
         artifacts: |
           ${{ env.build_dir }}/rom/*
 
+    - name: Copy build information
+      working-directory: /builder
+      run: |
+        cp info/manifest.txt rom/
+        cp info/config.buildinfo rom/
+        cp info/sha256sums.txt rom/
+
+    - name: Upload Firmware - FTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        dangerous-clean-slate: true
+        username: dev
+        server: ${{ secrets.ftp_address }}
+        password: ${{ secrets.ftp_password }}
+        server-dir: release/${{ matrix.model }}/
+        local-dir: ${{ env.build_dir }}/rom/
+
+    - name: Release OTA
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        username: openwrt
+        server: ${{ secrets.ftp_address }}
+        password: ${{ secrets.ftp_password }}
+        server-dir: release/${{ matrix.model }}/
+        local-dir: ${{ env.build_dir }}/openwrt/ota/
+        dangerous-clean-slate: true
+
     - name: Install aliyunpan & login
       if: ${{ matrix.model != 'armv8' }}
       continue-on-error: true
@@ -234,13 +261,3 @@ jobs:
       run: |
         sshpass -p ${{ secrets.user_password }} ssh -o StrictHostKeyChecking=no root@${{ secrets.guangzhou_address }} >/dev/null 2>&1
         sshpass -p ${{ secrets.user_password }} ssh root@${{ secrets.guangzhou_address }} "/opt/sbin/fw-upload ${{ matrix.model }}"
-
-    - name: Release OTA
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-      with:
-        username: openwrt
-        server: ${{ secrets.ftp_address }}
-        password: ${{ secrets.ftp_password }}
-        server-dir: release/${{ matrix.model }}/
-        local-dir: ${{ env.build_dir }}/openwrt/ota/
-        dangerous-clean-slate: true

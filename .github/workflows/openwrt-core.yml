@@ -96,7 +96,7 @@ jobs:
       uses: peter-evans/repository-dispatch@v3
       with:
         token: ${{ secrets.workflow_token }}
-        repository: sbwml/openwrt_core
+        repository: sbwml/openwrt_core2
         event-type: sync
 
     - name: Delete Cached
