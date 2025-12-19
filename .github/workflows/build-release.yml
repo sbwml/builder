@@ -187,78 +187,8 @@ jobs:
         local-dir: ${{ env.build_dir }}/openwrt/ota/
         dangerous-clean-slate: true
 
-    - name: Install aliyunpan & login
+    - name: Upload Firmware - aDrive
       if: ${{ matrix.model != 'armv8' }}
-      continue-on-error: true
-      working-directory: /builder
-      timeout-minutes: 1
-      run: |
-        if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
-          device_id=${{ secrets.device_id_r4s }}
-        elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
-          device_id=${{ secrets.device_id_r5s }}
-        elif [ "${{ matrix.model }}" = "nanopi-r76s" ]; then
-          device_id=${{ secrets.device_id_r76s }}
-        elif [ "${{ matrix.model }}" = "x86_64" ]; then
-          device_id=${{ secrets.device_id_x86 }}
-        fi
-        sudo wget -q ${{ secrets.aliyunpan_go }} -O /bin/aliyunpan
-        sudo chmod 0755 /bin/aliyunpan
-        sudo sh -c 'echo "${{ secrets.aliyunpan_us_node }} api.alipan.com auth.alipan.com www.alipan.com" >> /etc/hosts'
-        export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
-        aliyun_token=`curl -s ${{ secrets.aliyun_token }} | openssl enc -aes-256-cfb -pbkdf2 -a -d -k ${{ secrets.token_dec }}`
-        aliyunpan config set -device_id=$device_id >/dev/null 2>&1
-        echo
-        echo $aliyun_token | aliyunpan login
-
-    - name: Upload Firmware - releases
-      if: ${{ matrix.model != 'armv8' }}
-      id: upload
-      continue-on-error: true
-      working-directory: /builder
-      timeout-minutes: 20
-      run: |
-        export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
-        version=$(cat openwrt/version.txt)
-        if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
-          aliyunpan upload --timeout 20 --retry 5 --ow info/config.buildinfo openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload --timeout 20 --retry 5 --ow info/manifest.txt openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload --timeout 20 --retry 5 --ow info/sha256sums.txt openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload --timeout 20 --retry 5 --ow rom/*-r4s-ext4-sysupgrade.img.gz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload --timeout 20 --retry 5 --ow rom/*-r4s-squashfs-sysupgrade.img.gz openwrt/nanopi-r4s/releases/${{ matrix.tag.version }}/$version/
-        elif [ "${{ matrix.model }}" = "nanopi-r5s" ]; then
-          aliyunpan upload --timeout 20 --retry 5 --ow info/config.buildinfo openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload --timeout 20 --retry 5 --ow info/manifest.txt openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload --timeout 20 --retry 5 --ow info/sha256sums.txt openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload --timeout 20 --retry 5 --ow rom/*-r5c-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload --timeout 20 --retry 5 --ow rom/*-r5c-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload --timeout 20 --retry 5 --ow rom/*-r5s-ext4-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload --timeout 20 --retry 5 --ow rom/*-r5s-squashfs-sysupgrade.img.gz openwrt/nanopi-r5s/releases/${{ matrix.tag.version }}/$version/
-        elif [ "${{ matrix.model }}" = "nanopi-r76s" ]; then
-          aliyunpan upload --timeout 20 --retry 5 --ow info/config.buildinfo openwrt/nanopi-r76s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload --timeout 20 --retry 5 --ow info/manifest.txt openwrt/nanopi-r76s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload --timeout 20 --retry 5 --ow info/sha256sums.txt openwrt/nanopi-r76s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload --timeout 20 --retry 5 --ow rom/*-r76s-ext4-sysupgrade.img.gz openwrt/nanopi-r76s/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload --timeout 20 --retry 5 --ow rom/*-r76s-squashfs-sysupgrade.img.gz openwrt/nanopi-r76s/releases/${{ matrix.tag.version }}/$version/
-        elif [ "${{ matrix.model }}" = "x86_64" ]; then
-          aliyunpan upload --timeout 20 --retry 5 --ow info/config.buildinfo openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload --timeout 20 --retry 5 --ow info/manifest.txt openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload --timeout 20 --retry 5 --ow info/sha256sums.txt openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload --timeout 20 --retry 5 --ow rom/*-generic-rootfs.tar.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload --timeout 20 --retry 5 --ow rom/*-ext4-combined-efi.img.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
-          aliyunpan upload --timeout 20 --retry 5 --ow rom/*-squashfs-combined-efi.img.gz openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/
-          # virtual machine images
-          aliyunpan upload --timeout 20 --retry 5 --ow virtual_images/README.md openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/virtual_machine_images/
-          aliyunpan upload --timeout 20 --retry 5 --ow virtual_images/sha256sums.txt openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/virtual_machine_images/
-          aliyunpan upload --timeout 20 --retry 5 --ow virtual_images/*.vmdk openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/virtual_machine_images/
-          aliyunpan upload --timeout 20 --retry 5 --ow virtual_images/*.vhd openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/virtual_machine_images/
-          aliyunpan upload --timeout 20 --retry 5 --ow virtual_images/*.qcow2 openwrt/x86_64/releases/${{ matrix.tag.version }}/$version/virtual_machine_images/
-        fi
-        aliyunpan recycle delete -all
-        echo y | aliyunpan logout
-
-    - name: Retry Upload Firmware - releases
-      if: steps.upload.outcome == 'failure'
       run: |
         sshpass -p ${{ secrets.user_password }} ssh -o StrictHostKeyChecking=no root@${{ secrets.guangzhou_address }} >/dev/null 2>&1
         sshpass -p ${{ secrets.user_password }} ssh root@${{ secrets.guangzhou_address }} "/opt/sbin/fw-upload ${{ matrix.model }}"

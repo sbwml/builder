@@ -30,11 +30,11 @@
 
 ## 版本信息
 
-**[Releases](https://r5s.cooluc.com/releases)：正式版 - 基于 [OpenWrt](https://github.com/openwrt/openwrt/releases) 最新 Releases 源代码和软件包编译（推荐） - [Linux 6.18 LTS](https://kernel.org/)**
+**[Releases](https://dev.cooluc.com/release)：正式版 - 基于 [OpenWrt](https://github.com/openwrt/openwrt/releases) 最新 Releases 源代码和软件包编译（推荐） - [Linux 6.18 LTS](https://kernel.org/)**
 
-**[Snapshots](https://r5s.cooluc.com/snapshots)：开发版 - 基于 [OpenWrt](https://github.com/openwrt/openwrt/tree/openwrt-24.10) 最新 openwrt-24.10 分支源代码和软件包编译 - [Linux 6.18 LTS](https://kernel.org/)（每夜构建）**
+**[Snapshots](https://snapshot.cooluc.com)：开发版 - 基于 [OpenWrt](https://github.com/openwrt/openwrt/tree/openwrt-24.10) 最新 openwrt-24.10 分支源代码和软件包编译 - [Linux 6.18 LTS](https://kernel.org/)（每夜构建）**
 
-**[Minimal](https://r5s.cooluc.com/minimal)：轻量版 - 基于 [OpenWrt](https://github.com/openwrt/openwrt/releases) 最新 Releases 源代码和软件包编译，无内置插件（不推荐） - [Linux 6.18 LTS](https://kernel.org/)**
+**[Minimal](https://dev.cooluc.com/minimal)：轻量版 - 基于 [OpenWrt](https://github.com/openwrt/openwrt/releases) 最新 Releases 源代码和软件包编译，无内置插件（不推荐） - [Linux 6.18 LTS](https://kernel.org/)**
 
 ------
 
@@ -193,7 +193,7 @@
 
 ------
 
-## NanoPi R4S/R5S 固件烧写（SD）
+## NanoPi R4S/R5S/R76S 固件烧写（SD）
 
 **推荐工具：**<a href="https://www.balena.io/etcher/" target="_blank" ><img style="height:25px;" src="https://cdn.cooluc.com/r4s/balena.svg" /></a>
 
@@ -245,7 +245,7 @@
 
 ------
 
-## 固件烧写（SD to eMMC）
+## 固件烧写（NanoPi R5S/R76S SD to eMMC）
 
 ```shell
 # 1、下载最新 Releases 固件并通过 SD 卡启动
