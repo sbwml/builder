@@ -24,7 +24,7 @@
 
 **X86_64: https://x86.cooluc.com**
 
-**24.10-SNAPSHOT: https://snapshot.cooluc.com**
+**25.12-SNAPSHOT: https://snapshot.cooluc.com**
 
 **备用下载: https://dev.cooluc.com**
 
@@ -32,7 +32,7 @@
 
 **[Releases](https://dev.cooluc.com/release)：正式版 - 基于 [OpenWrt](https://github.com/openwrt/openwrt/releases) 最新 Releases 源代码和软件包编译（推荐） - [Linux 6.18 LTS](https://kernel.org/)**
 
-**[Snapshots](https://snapshot.cooluc.com)：开发版 - 基于 [OpenWrt](https://github.com/openwrt/openwrt/tree/openwrt-24.10) 最新 openwrt-24.10 分支源代码和软件包编译 - [Linux 6.18 LTS](https://kernel.org/)（每夜构建）**
+**[Snapshots](https://snapshot.cooluc.com)：开发版 - 基于 [OpenWrt](https://github.com/openwrt/openwrt/tree/openwrt-25.12) 最新 openwrt-25.12 分支源代码和软件包编译 - [Linux 6.18 LTS](https://kernel.org/)（每夜构建）**
 
 **[Minimal](https://dev.cooluc.com/minimal)：轻量版 - 基于 [OpenWrt](https://github.com/openwrt/openwrt/releases) 最新 Releases 源代码和软件包编译，无内置插件（不推荐） - [Linux 6.18 LTS](https://kernel.org/)**
 
@@ -253,7 +253,7 @@
 
 # 3、使用内建命令写入固件到 eMMC 存储（请根据实际文件名称与路径）
 
-emmc-install /tmp/openwrt-24.10.0-rockchip-armv8-friendlyarm_nanopi-r5s-squashfs-sysupgrade.img.gz
+emmc-install /tmp/openwrt-25.12.0-rockchip-armv8-friendlyarm_nanopi-r5s-squashfs-sysupgrade.img.gz
 
 ```
 

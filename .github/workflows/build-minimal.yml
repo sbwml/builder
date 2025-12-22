@@ -23,7 +23,7 @@ jobs:
           - x86_64
         tag:
           - type: rc2
-            version: openwrt-24.10
+            version: openwrt-25.12
 
     steps:
     - name: Setup variables

@@ -19,7 +19,7 @@ jobs:
           - x86_64
         tag:
           - type: rc2
-            version: openwrt-24.10
+            version: openwrt-25.12
 
     steps:
     - name: Setup variables
@@ -82,10 +82,10 @@ jobs:
     - name: Release kernel modules
       uses: ncipollo/release-action@v1.14.0
       with:
-        name: kmod-snapshot
+        name: kmod-openwrt-25.12
         allowUpdates: true
         prerelease: true
-        tag: snapshot
+        tag: openwrt-25.12
         commit: main
         replacesArtifacts: true
         token: ${{ secrets.workflow_token }}
@@ -96,7 +96,7 @@ jobs:
       uses: peter-evans/repository-dispatch@v3
       with:
         token: ${{ secrets.workflow_token }}
-        repository: sbwml/openwrt_core2
+        repository: sbwml/openwrt_core3
         event-type: sync
 
     - name: Delete Cached

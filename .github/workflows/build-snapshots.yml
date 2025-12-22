@@ -23,7 +23,7 @@ jobs:
           - x86_64
         tag:
           - type: dev
-            version: openwrt-24.10
+            version: openwrt-25.12
 
     steps:
     - name: Setup variables
@@ -166,7 +166,7 @@ jobs:
       run: |
         export ALIYUNPAN_CONFIG_DIR="$(pwd)/.aliyunpan"
         DATE=$(date "+%Y-%m-%d")
-        branch=24.10-SNAPSHOT
+        branch=25.12-SNAPSHOT
         if [ "${{ matrix.model }}" = "nanopi-r4s" ]; then
           aliyunpan upload --timeout 30 --retry 10 --ow info/config.buildinfo openwrt/nanopi-r4s/snapshots/$branch/$DATE/
           aliyunpan upload --timeout 30 --retry 10 --ow info/manifest.txt openwrt/nanopi-r4s/snapshots/$branch/$DATE/
