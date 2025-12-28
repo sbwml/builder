@@ -64,7 +64,7 @@ jobs:
       uses: sbwml/actions@install-llvm
 
     - name: Restore Cached
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: /builder/.ccache
         key: ${{ matrix.tag.version }}-${{ env.ccache_model }}
@@ -130,7 +130,7 @@ jobs:
         echo current_hour="$(date +'%H')" >> "$GITHUB_ENV"
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: ${{ env.build_date }}-${{ matrix.model }}-${{ matrix.tag.version }}
         path: ${{ env.build_dir }}/rom/*.*
@@ -204,7 +204,7 @@ jobs:
         cp -a info/* rom/
 
     - name: Upload Firmware - FTP
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.6
       with:
         dangerous-clean-slate: true
         username: snapshot

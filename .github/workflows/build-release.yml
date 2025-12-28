@@ -64,7 +64,7 @@ jobs:
       uses: sbwml/actions@install-llvm
 
     - name: Restore Cached
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: /builder/.ccache
         key: ${{ matrix.tag.version }}-${{ env.ccache_model }}
@@ -130,6 +130,8 @@ jobs:
         fi
         cd ..
         tar zcf rom/buildinfo_${{ matrix.model }}.tar.gz info
+        echo '## Releases Version' > ${{ env.build_dir }}/bodyFile
+        echo '**This build includes Docker, Passwall, HomeProxy, and other commonly used plugins. However, the firmware size is relatively large, making it suitable for most users.**' >> ${{ env.build_dir }}/bodyFile
 
     - name: Create virtual machine images
       if: ${{ matrix.model == 'x86_64' }}
@@ -148,14 +150,16 @@ jobs:
         echo "<center><h1>x86_64 虚拟机平台镜像</h1></center>" > README.md
 
     - name: Create release
-      uses: ncipollo/release-action@v1.14.0
+      uses: ncipollo/release-action@v1.20.0
       with:
         name: OpenWrt-${{ env.latest_release }}
         allowUpdates: true
         tag: ${{ env.latest_release }}
         commit: main
         replacesArtifacts: true
+        makeLatest: true
         token: ${{ secrets.workflow_token }}
+        bodyFile: ${{ env.build_dir }}/bodyFile
         artifacts: |
           ${{ env.build_dir }}/rom/*
 
@@ -168,7 +172,7 @@ jobs:
         rm -rf rom/buildinfo_*
 
     - name: Upload Firmware - FTP
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.6
       with:
         dangerous-clean-slate: true
         username: dev
@@ -178,7 +182,7 @@ jobs:
         local-dir: ${{ env.build_dir }}/rom/
 
     - name: Release OTA
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.6
       with:
         username: openwrt
         server: ${{ secrets.ftp_address }}

@@ -24,9 +24,7 @@
 
 **X86_64: https://x86.cooluc.com**
 
-**25.12-SNAPSHOT: https://snapshot.cooluc.com**
-
-**备用下载: https://dev.cooluc.com**
+**OTA 下载通道: https://dev.cooluc.com**
 
 ## 版本信息
 
@@ -57,15 +55,22 @@
 | RTC 时钟 (HYM8563)                                | ✅   | 固件重置（squashfs）         | ✅   |
 | BBRv3 拥塞控制                                    | ✅   | LLVM-BPF 支持                | ✅   |
 | TCP Brutal 拥塞控制                               | ✅   | Shortcut-FE（支持 UDP 入站） | ✅   |
-| KVM 虚拟化支持                                    | ✅   | LRNG 随机数（v57）           | ✅   |
+| KVM 虚拟化支持                                    | ✅   | LRNG 随机数（v59）           | ✅   |
 | NGINX & CURL HTTP3/QUIC 支持                      | ✅   | PWM 风扇控制                 | ✅   |
+
+**NanoPi R76S**
+
+| 基本                                              | 状态 | 基本                         | 状态 |
+|:-------------------------------------------------:|:----:|:----------------------------:|:----:|
+| Rocket NPU 驱动                                   | ✅   | microSD 启动                 | ✅   |
+| SDIO WiFi（AP & Client）& Bluetooth	              | ✅   | PCI-MSI 中断优化（A72）       | ✅   |
 
 
 | 内置插件                 | 状态 | 内置插件         | 状态 |
 |:------------------------:|:----:|:----------------:|:----:|
 | PassWall                 | ✅   | Docker（nftables）| ✅   |
 | HomeProxy                | ✅   | TTY 终端         | ✅   |
-| FileBrowser              | ✅   | NetData 监控     | ✅   |
+| Quick 文件管理            | ✅   | rtp2httpd       | ✅   |
 | qBittorrent              | ✅   | DiskMan 磁盘管理 | ✅   |
 | MosDNS                   | ✅   | CPU 性能调节     | ✅   |
 | 动态 DNS                 | ✅   | SQM 列队管理     | ✅   |
@@ -81,7 +86,6 @@
 | 隔空播放（AirConnect）   | ✅   | WebDav           | ✅   |
 | 自定义命令               | ✅   | AirPlay 2        | ✅   |
 | 网速测试                 | ✅   | NATMap           | ✅   |
-| rtp2httpd                | ✅   |                  |      |
 
 ✅ 可用
 
