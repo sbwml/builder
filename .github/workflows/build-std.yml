@@ -1,9 +1,9 @@
-name: Build releases
+name: Build standard
 
 on:
   workflow_dispatch:
   repository_dispatch:
-    types: [release]
+    types: [std]
 
 jobs:
   build:
@@ -78,7 +78,7 @@ jobs:
         git_password: ${{ secrets.ftp_password }}
         private_url: ${{ secrets.private_url }}
       run: |
-        export KERNEL_CLANG_LTO=y BUILD_FAST=y ENABLE_CCACHE=y ENABLE_OTA=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y USE_GCC15=y ENABLE_MOLD=y
+        export KERNEL_CLANG_LTO=y BUILD_FAST=y ENABLE_CCACHE=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y STD_BUILD=y USE_GCC15=y ENABLE_MOLD=y
         bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
         cd openwrt
         tags=$(git describe --abbrev=0 --tags)
@@ -120,30 +120,22 @@ jobs:
         fi
         cd ..
         tar zcf rom/buildinfo_${{ matrix.model }}.tar.gz info
-        echo '## Releases Version' > ${{ env.build_dir }}/bodyFile
-        echo '**This build includes Docker, Passwall, HomeProxy, and other commonly used plugins. However, the firmware size is relatively large, making it suitable for most users.**' >> ${{ env.build_dir }}/bodyFile
+        echo '## Standard Version' > ${{ env.build_dir }}/bodyFile
+        echo '**This build does not include Docker. It comes with HomeProxy and a set of commonly used plugins, offering a balanced feature set with a moderate firmware size.**' >> ${{ env.build_dir }}/bodyFile
 
     - name: Create release
       uses: ncipollo/release-action@v1.20.0
       with:
-        name: OpenWrt-${{ env.latest_release }}
+        name: OpenWrt-${{ env.latest_release }} Standard
         allowUpdates: true
-        tag: ${{ env.latest_release }}
+        tag: ${{ env.latest_release }}-standard
         commit: main
         replacesArtifacts: true
-        makeLatest: true
+        makeLatest: false
         token: ${{ secrets.workflow_token }}
         bodyFile: ${{ env.build_dir }}/bodyFile
         artifacts: |
           ${{ env.build_dir }}/rom/*
-
-    - name: Copy build information
-      working-directory: /builder
-      run: |
-        cp info/manifest.txt rom/
-        cp info/config.buildinfo rom/
-        cp info/sha256sums.txt rom/
-        rm -rf rom/buildinfo_*
 
     - name: Upload Firmware - FTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.6
@@ -152,7 +144,7 @@ jobs:
         username: dev
         server: ${{ secrets.ftp_address }}
         password: ${{ secrets.ftp_password }}
-        server-dir: release/${{ matrix.model }}/
+        server-dir: standard/${{ matrix.model }}/
         local-dir: ${{ env.build_dir }}/rom/
 
     - name: Release OTA
@@ -161,12 +153,6 @@ jobs:
         username: openwrt
         server: ${{ secrets.ftp_address }}
         password: ${{ secrets.ftp_password }}
-        server-dir: release/${{ matrix.model }}/
+        server-dir: standard/${{ matrix.model }}/
         local-dir: ${{ env.build_dir }}/openwrt/ota/
         dangerous-clean-slate: true
-
-    - name: Upload Firmware - aDrive
-      if: ${{ matrix.model != 'armv8' }}
-      run: |
-        sshpass -p ${{ secrets.user_password }} ssh -o StrictHostKeyChecking=no root@${{ secrets.guangzhou_address }} >/dev/null 2>&1
-        sshpass -p ${{ secrets.user_password }} ssh root@${{ secrets.guangzhou_address }} "/opt/sbin/fw-upload ${{ matrix.model }}"
