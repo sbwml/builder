@@ -78,7 +78,7 @@ jobs:
         git_password: ${{ secrets.ftp_password }}
         private_url: ${{ secrets.private_url }}
       run: |
-        export KERNEL_CLANG_LTO=y BUILD_FAST=y ENABLE_CCACHE=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_LRNG=y STD_BUILD=y USE_GCC15=y ENABLE_MOLD=y
+        export KERNEL_CLANG_LTO=y BUILD_FAST=y ENABLE_CCACHE=y ENABLE_BPF=y ENABLE_LTO=y ENABLE_OTA=y ENABLE_LRNG=y STD_BUILD=y USE_GCC15=y ENABLE_MOLD=y
         bash <(curl -sS ${{ secrets.script_url_general }}) ${{ matrix.tag.type }} ${{ matrix.model }}
         cd openwrt
         tags=$(git describe --abbrev=0 --tags)
