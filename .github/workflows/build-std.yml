@@ -137,6 +137,14 @@ jobs:
         artifacts: |
           ${{ env.build_dir }}/rom/*
 
+    - name: Copy build information
+      working-directory: /builder
+      run: |
+        cp info/manifest.txt rom/
+        cp info/config.buildinfo rom/
+        cp info/sha256sums.txt rom/
+        rm -rf rom/buildinfo_*
+
     - name: Upload Firmware - FTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.6
       with:
