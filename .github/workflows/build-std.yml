@@ -149,7 +149,7 @@ jobs:
       uses: SamKirkland/FTP-Deploy-Action@v4.3.6
       with:
         dangerous-clean-slate: true
-        username: dev
+        username: openwrt
         server: ${{ secrets.ftp_address }}
         password: ${{ secrets.ftp_password }}
         server-dir: standard/${{ matrix.model }}/
@@ -158,7 +158,7 @@ jobs:
     - name: Release OTA
       uses: SamKirkland/FTP-Deploy-Action@v4.3.6
       with:
-        username: openwrt
+        username: ota
         server: ${{ secrets.ftp_address }}
         password: ${{ secrets.ftp_password }}
         server-dir: standard/${{ matrix.model }}/

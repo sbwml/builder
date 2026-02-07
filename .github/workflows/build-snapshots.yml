@@ -207,8 +207,8 @@ jobs:
       uses: SamKirkland/FTP-Deploy-Action@v4.3.6
       with:
         dangerous-clean-slate: true
-        username: snapshot
+        username: openwrt
         server: ${{ secrets.ftp_address }}
         password: ${{ secrets.ftp_password }}
-        server-dir: ${{ matrix.model }}/
+        server-dir: snapshot/${{ matrix.model }}/
         local-dir: ${{ env.build_dir }}/rom/
