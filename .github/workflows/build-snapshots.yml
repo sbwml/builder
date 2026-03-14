@@ -204,7 +204,7 @@ jobs:
         cp -a info/* rom/
 
     - name: Upload Firmware - FTP
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+      uses: sbwml/FTP-Deploy-Action@master
       with:
         dangerous-clean-slate: true
         username: openwrt

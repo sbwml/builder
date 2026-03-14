@@ -124,7 +124,7 @@ jobs:
         echo '**This build includes Docker, Passwall, HomeProxy, and other commonly used plugins. However, the firmware size is relatively large, making it suitable for most users.**' >> ${{ env.build_dir }}/bodyFile
 
     - name: Create release
-      uses: ncipollo/release-action@v1.20.0
+      uses: ncipollo/release-action@main
       with:
         name: OpenWrt-${{ env.latest_release }}
         allowUpdates: true
@@ -146,7 +146,7 @@ jobs:
         rm -rf rom/buildinfo_*
 
     - name: Upload Firmware - FTP
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+      uses: sbwml/FTP-Deploy-Action@master
       with:
         dangerous-clean-slate: true
         username: openwrt
@@ -156,7 +156,7 @@ jobs:
         local-dir: ${{ env.build_dir }}/rom/
 
     - name: Release OTA
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+      uses: sbwml/FTP-Deploy-Action@master
       with:
         username: ota
         server: ${{ secrets.ftp_address }}

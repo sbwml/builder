@@ -132,7 +132,7 @@ jobs:
         echo '**This build does not include any third‑party plugins, resulting in the smallest possible firmware size.**' >> ${{ env.build_dir }}/bodyFile
 
     - name: Create release
-      uses: ncipollo/release-action@v1.20.0
+      uses: ncipollo/release-action@main
       with:
         name: OpenWrt-${{ env.latest_release }} Minimal
         allowUpdates: true
@@ -152,7 +152,7 @@ jobs:
         path: ${{ env.build_dir }}/rom/*.*
 
     - name: Upload Firmware - FTP
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+      uses: sbwml/FTP-Deploy-Action@master
       with:
         dangerous-clean-slate: true
         username: openwrt
@@ -162,7 +162,7 @@ jobs:
         local-dir: ${{ env.build_dir }}/rom/
 
     - name: Release OTA
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+      uses: sbwml/FTP-Deploy-Action@master
       with:
         username: ota
         server: ${{ secrets.ftp_address }}

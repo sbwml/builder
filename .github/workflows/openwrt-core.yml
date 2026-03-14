@@ -80,7 +80,7 @@ jobs:
         mv ${{ env.build_dir }}/openwrt/*-*.tar.gz ${{ env.build_dir }}/openwrt/$kmod_name
 
     - name: Release kernel modules
-      uses: ncipollo/release-action@v1.14.0
+      uses: ncipollo/release-action@main
       with:
         name: kmod-openwrt-25.12
         allowUpdates: true
