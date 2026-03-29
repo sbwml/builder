@@ -144,6 +144,7 @@ jobs:
         cp info/config.buildinfo rom/
         cp info/sha256sums.txt rom/
         rm -rf rom/buildinfo_*
+        touch rom/.ftp-deploy-sync-state.json
 
     - name: Upload Firmware - FTP
       uses: sbwml/FTP-Deploy-Action@master

@@ -202,6 +202,7 @@ jobs:
       working-directory: /builder
       run: |
         cp -a info/* rom/
+        touch rom/.ftp-deploy-sync-state.json
 
     - name: Upload Firmware - FTP
       uses: sbwml/FTP-Deploy-Action@master
