@@ -68,24 +68,23 @@
 
 | 内置插件                 | 状态 | 内置插件         | 状态 |
 |:------------------------:|:----:|:----------------:|:----:|
-| PassWall                 | ✅   | Docker（nftables）| ✅   |
-| HomeProxy                | ✅   | TTY 终端         | ✅   |
+| HomeProxy                | ✅   | Docker（nftables）| ✅   |
+| Nikki                    | ✅   | TTY 终端         | ✅   |
 | Quick 文件管理            | ✅   | rtp2httpd       | ✅   |
 | qBittorrent              | ✅   | DiskMan 磁盘管理 | ✅   |
 | MosDNS                   | ✅   | CPU 性能调节     | ✅   |
 | 动态 DNS                 | ✅   | SQM 列队管理     | ✅   |
 | Watchcat                 | ✅   | nlbw 宽带监控    | ✅   |
 | KMS 服务器               | ✅   | Socat            | ✅   |
-| FRP 客户端               | ✅   | 应用过滤         | ✅   |
 | 网络唤醒                 | ✅   | 访问控制         | ✅   |
 | 网络共享（Samba）        | ✅   | UPnP             | ✅   |
 | 锐捷认证                 | ✅   | IP 限速          | ✅   |
-| Aria2                    | ✅   | WireGuard        | ✅   |
+| FRP 客户端                | ✅   | WireGuard        | ✅   |
 | Alist 文件列表           | ✅   | L2TP             | ✅   |
-| USB 打印服务器           | ✅   | ZeroTier         | ✅   |
 | 隔空播放（AirConnect）   | ✅   | WebDav           | ✅   |
 | 自定义命令               | ✅   | AirPlay 2        | ✅   |
 | 网速测试                 | ✅   | NATMap           | ✅   |
+| OTA                     | ✅   | ZeroTier         | ✅   |
 
 ✅ 可用
 
@@ -105,7 +104,7 @@
 　├── 路由<br/>
 　├── 防火墙<br/>
 　├── 系统日志<br/>
-　├── 系统进程<br/>
+　├── 进程<br/>
 　├── 实时信息<br/>
 　├── WireGuard<br/>
 　└── 释放内存
@@ -122,9 +121,10 @@
 　├── 磁盘管理<br/>
 　├── LED 配置<br/>
 　├── 在线升级<br/>
-　├── 备份/升级<br/>
+　├── 备份与更新<br/>
 　├── 自定义命令<br/>
 　├── 文件管理<br/>
+　├── Aurora设置<br/>
 　├── 定时重启<br/>
 　├── 主题设置<br/>
 　├── CPU 性能调节<br/>
@@ -132,53 +132,49 @@
 </details>
 <details>
 <summary><b>├── 服务</b></summary>
-　├── PassWall<br/>
 　├── HomeProxy<br/>
 　├── qBittorrent<br/>
 　├── MosDNS<br/>
 　├── 动态 DNS<br/>
 　├── KMS 服务器<br/>
 　├── Watchcat<br/>
+　├── 网络唤醒<br/>
 　├── 隔空播放<br/>
-　├── AirPlay 2<br/>
-　├── 应用过滤<br/>
-　├── Aria2<br/>
-　├── Frp 客户端<br/>
+　├── Airplay 2<br/>
+　├── Ftp 客户端<br/>
 　├── 锐捷认证<br/>
 　├── NATMap<br/>
+　├── Nikki<br/>
 　├── OpenList<br/>
 　├── rtp2httpd<br/>
 　├── 网络共享<br/>
-　├── 网络唤醒<br/>
+　├── Socat<br/>
+　├── WebDAV<br/>
 　└── ZeroTier
 </details>
 <details>
 <summary><b>├── Docker</b></summary>
 　├── 概览<br/>
+　├── 配置<br/>
 　├── 容器<br/>
 　├── 镜像<br/>
 　├── 网络<br/>
 　├── 卷标<br/>
-　├── 事件<br/>
-　└── 配置
-</details>
-<details>
-<summary><b>├── 网络存储</b></summary>
-　├── USB 打印服务器<br/>
-　└── WebDav
+　└── 事件
 </details>
 <details>
 <summary><b>├── 网络</b></summary>
 　├── 接口<br/>
+　├── 无线<br/>
 　├── 路由<br/>
-　├── DHCP/DNS<br/>
+　├── DHCP<br/>
+　├── DNS<br/>
 　├── 网络诊断<br/>
 　├── 网速测试<br/>
 　├── SQM 队列管理<br/>
 　├── 防火墙<br/>
 　├── UPnP IGD 和 PCP<br/>
 　├── 带宽监控<br/>
-　├── Socat<br/>
 　└── 网速控制
 </details>
 　└── <b>退出</b>
@@ -193,7 +189,6 @@
 **SquashFS（推荐）：固件文件名带有 “squashfs”，SquashFS 为只读文件系统，支持系统重置，更能避免 SD 卡文件系统触发写保护，支持在线 OTA 升级，适合绝大部分用户使用。**
 
 **Ext4：固件文件名带有 “ext4”，Ext4 文件系统具备整个分区可读写性质，更适合熟悉 Linux 系统的用户使用，但意外断电有几率造成分区写入保护。**
-
 
 ------
 
@@ -229,8 +224,6 @@
 
   <img style="height:100px;" src="https://cdn.cooluc.com/r4s/r5s_mask.webp" />
 
-
-
 - **打开 瑞芯微开发工具：正常状态：（发现一个Maskrom设备）  缺少驱动：（没有发现设备）**
 
   **安装步骤：**
@@ -239,11 +232,7 @@
   
   <img src="https://cdn.cooluc.com/r4s/select_firmware.png" />
   
-  
-  
   **② 点击 “执行”（固件写入完成后会自动重启进入 OpenWrt 系统）**
-  
-  
   
 - ***注意：通过电脑烧写固件请使用本站下载的 [瑞芯微开发工具](https://media.cooluc.com/%E8%BD%AF%E4%BB%B6/RKDevTool/RKDevTool_Release_v2.84.zip)。***
 

@@ -121,7 +121,7 @@ jobs:
         cd ..
         tar zcf rom/buildinfo_${{ matrix.model }}.tar.gz info
         echo '## Releases Version' > ${{ env.build_dir }}/bodyFile
-        echo '**This build includes Docker, Passwall, HomeProxy, and other commonly used plugins. However, the firmware size is relatively large, making it suitable for most users.**' >> ${{ env.build_dir }}/bodyFile
+        echo '**This build includes Docker, Nikki, HomeProxy, and other commonly used plugins. However, the firmware size is relatively large, making it suitable for most users.**' >> ${{ env.build_dir }}/bodyFile
 
     - name: Create release
       uses: ncipollo/release-action@main
